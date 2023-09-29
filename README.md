@@ -22,6 +22,7 @@ using namespace UltraEngine::Game;
 #include "Components/Motion/Mover.hpp"
 #include "Components/Player/CameraControls.hpp"
 
+// Define Components.
 static void RegisterComponents()
 {
     RegisterComponent<Mover>();
