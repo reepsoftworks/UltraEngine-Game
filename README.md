@@ -306,7 +306,7 @@ public:
 			{
 				speed *= 10.0f;
 			}
-			else if (GetInput()->Down("Slowdown"))
+			else if (GetInput()->Down("Crouch"))
 			{
 				speed *= 0.25f;
 			}
@@ -319,14 +319,14 @@ public:
 	}
 
 	virtual void Update()
-    {
+    	{
 		if (GetInput()->Hit("Pause"))
 		{
 			GetStage()->Pause(!GetStage()->GetPaused());
 		}
 
 		GamePlayer::Update();
-    }
+    	}
 
 	//This method will work with simple components
 	virtual shared_ptr<Component> Copy()
@@ -354,25 +354,25 @@ public:
 	}
 
 	virtual bool Load(table& properties, shared_ptr<Stream> binstream, shared_ptr<Map> scene, const LoadFlags flags)
-    {
+	{
 		if (properties["lockmouse"].is_boolean()) lockmouse = properties["lockmouse"];
 		if (properties["allowmovement"].is_boolean()) allowmovement = properties["allowmovement"];
-        if (properties["movespeed"].is_number()) movespeed = properties["movespeed"];
+		if (properties["movespeed"].is_number()) movespeed = properties["movespeed"];
 		if (properties["topangle"].is_number()) topangle = properties["topangle"];
 		if (properties["bottomangle"].is_number()) bottomangle = properties["bottomangle"];
-
-		return true;
-    }
 	
-    virtual bool Save(table& properties, shared_ptr<Stream> binstream, shared_ptr<Map> scene, const SaveFlags flags)
-    {
+		return true;
+	}
+		
+	virtual bool Save(table& properties, shared_ptr<Stream> binstream, shared_ptr<Map> scene, const SaveFlags flags)
+	{
 		properties["lockmouse"] = lockmouse;
 		properties["allowmovement"] = allowmovement;
 		properties["topangle"] = topangle;
 		properties["bottomangle"] = bottomangle;
-
+	
 		return true;
-    }
+	}
 };
 ```
 
