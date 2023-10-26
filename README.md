@@ -8,7 +8,7 @@ Application source code for turning any [Ultra Engine](https://www.ultraengine.c
 - Input System: Dynamic, configurable and easy-to-use. The action based system for any type of game!
 - Built-In Settings: Engine settings and keybindings are handled and can be easily changed with the the built-in settings window.
 - Event Based Console: A simple but flexible console system for invoking additional functionality with components.
-
+- Sound Managment: Load sound via JSON scripts with the GameSpeaker class.
 This requires no additional dependencies outside the game engine and it's designed to be isolated within it's own folder. Getting started is easy! Drag and drop the "Game" folder (Source/Game) into your projects "Source" directory. You'll also need to copy the "config.json" file as it's needed for the system to know the details of your application such as the name and appid (if applicable).
 
 Set your main.cpp file to look like the below:
@@ -21,12 +21,15 @@ using namespace UltraEngine::Game;
 // Components
 #include "Components/Motion/Mover.hpp"
 #include "Components/Player/CameraControls.hpp"
+#include "Components/Player/FirstPersonControls.hpp"
 
 // Define Components.
 static void RegisterComponents()
 {
+    // Stock Components
     RegisterComponent<Mover>();
     RegisterComponent<CameraControls>();
+    RegisterComponent<FirstPersonControls>();
 }
 
 // Define default controls.
@@ -40,6 +43,8 @@ static void InstallControls(shared_ptr<GameController> controller)
     controller->SetAction("ConsoleApp", BUTTON_KEY_F1);
     controller->SetAction("Fullscreen", BUTTON_KEY_F11);
     controller->SetAction("Screenshot", BUTTON_KEY_F2);
+    controller->SetAction("Quick Save", BUTTON_KEY_F5);
+    controller->SetAction("Quick Load", BUTTON_KEY_F6);
 
     // Camera
     ButtonAxis moveaxis =
@@ -51,10 +56,11 @@ static void InstallControls(shared_ptr<GameController> controller)
     };
     controller->SetAction("Movement", moveaxis, "InGameControls");
     controller->SetAction("Sprint", BUTTON_KEY_SHIFT, "InGameControls");
-    controller->SetAction("Slowdown", BUTTON_KEY_CONTROL, "InGameControls");
+    controller->SetAction("Crouch", BUTTON_KEY_CONTROL, "InGameControls");
     controller->SetAction("Climb", BUTTON_KEY_Q, "InGameControls");
     controller->SetAction("Desent", BUTTON_KEY_E, "InGameControls");
     controller->SetAction("Camera", AXIS_MOUSE, "InGameControls");
+    controller->SetAction("Jump", BUTTON_KEY_SPACE, "InGameControls");
 
     // Settings
     controller->SetSetting("Raw Mouse", false);
@@ -163,216 +169,278 @@ Here's what the CameraControls.hpp can look like when intergrated with the GameP
 using namespace UltraEngine;
 using namespace UltraEngine::Game;
 
-class CameraControls : public GamePlayer
+class Spectator : public GamePlayer
 {
     bool freelookstarted{ false };
-	Vec2 freelookmousepos;
-	Vec2 lookchange;
-	Vec3 freelookrotation;
-	float mousesmoothing;
-	float mouselookspeed;
+    Vec2 freelookmousepos;
+    Vec2 lookchange;
+    Vec3 freelookrotation;
+
+    // Crosshair
+    shared_ptr<Camera> hudcam;
+    std::array<shared_ptr<Sprite>, 5> sprite;
 public:
-	bool lockmouse{ false };
-	bool allowmovement{ true };
-	float movespeed = 4.0f;
-	float topangle = -90.0f;
-	float bottomangle = 90.0f;
+    bool lockmouse{ false };
+    bool allowmovement{ true };
+    float movespeed = 4.0f;
+    float topangle = -90.0f;
+    float bottomangle = 90.0f;
 
-	CameraControls()
-	{
-		name = "CameraControls";
-		mousesmoothing = 0.0f;
-		mouselookspeed = 1.0f;
-	}
+    Spectator()
+    {
+        name = "Spectator";
+    }
 
-	virtual void Start()
-	{
-		GamePlayer::Start();
+    void BuildCrosshair()
+    {
+        auto sz = GetProgram()->GetFramebufferSize();
+        auto world = GetStage()->GameWorld();
+        hudcam = CreateCamera(world, PROJECTION_ORTHOGRAPHIC);
+        hudcam->SetRenderLayers(1);
+        hudcam->SetClearMode(CLEAR_DEPTH);
+        hudcam->SetPosition(float(sz.x) * 0.5f, float(sz.y) * 0.5f);
 
-		// Enable sound.
-		GetEntity()->Listen();
+        sprite[0] = CreateSprite(world, 1.0f, 1.0f);
+        auto mat = CreateMaterial();
+        if (mat)
+        {
+            mat->SetColor(1.0f, 1.0f, 1.0f, 0.8f);
+            mat->SetShaderFamily(LoadShaderFamily("Shaders/Unlit.fam"));
+            sprite[0]->SetMaterial(mat);
+            mat = NULL;
+        }
+        sprite[0]->SetPosition((float)sz.x / 2, (float)sz.y / 2);
+        sprite[0]->SetRenderLayers(1);
 
-		Listen(EVENT_PAUSESTATE, GetProgram());
-		Listen(EVENT_GRAPHICSWINDOW, GetProgram());
-		GetInput()->CenterCursor();
-		GetInput()->SetCursorHidden(true);
+        sprite[1] = sprite[0]->Instantiate(world)->As<Sprite>();
+        sprite[1]->SetPosition((float)sz.x / 2, (float)sz.y / 2 + 8);
+        sprite[1]->SetRenderLayers(1);
 
-		GetInput()->SetActiveSet("InGameControls");
-	}
+        sprite[2] = sprite[0]->Instantiate(world)->As<Sprite>();
+        sprite[2]->SetPosition((float)sz.x / 2, (float)sz.y / 2 - 8);
+        sprite[2]->SetRenderLayers(1);
 
-	void RawMouseLook()
-	{
-		auto entity = GetEntity();
-		if (lockmouse)
-		{
-			freelookstarted = false;
-			return;
-		}
+        sprite[3] = sprite[0]->Instantiate(world)->As<Sprite>();
+        sprite[3]->SetPosition((float)sz.x / 2 - 8, (float)sz.y / 2);
+        sprite[3]->SetRenderLayers(1);
 
-		if (!freelookstarted)
-		{
-			freelookstarted = true;
-			freelookrotation = entity->GetRotation(true);
-			freelookmousepos = GetInput()->Axis("Camera");
-		}
+        sprite[4] = sprite[0]->Instantiate(world)->As<Sprite>();
+        sprite[4]->SetPosition((float)sz.x / 2 + 8, (float)sz.y / 2);
+        sprite[4]->SetRenderLayers(1);
+    }
 
-		int inverse = 1;
-		if (GetInput()->GetSettingBool("Inverse Mouse")) inverse = -1;
+    virtual bool Load(table& properties, shared_ptr<Stream> binstream, shared_ptr<Map> scene, const LoadFlags flags)
+    {
+        Print("Loading component: " + QuoteWString(name));
 
-		auto newmousepos = GetInput()->Axis("Camera");
-		lookchange.x = lookchange.x * mousesmoothing + (newmousepos.y - freelookmousepos.y) * 100.0f * mouselookspeed * (1.0f - mousesmoothing);
-		lookchange.y = lookchange.y * mousesmoothing + (newmousepos.x - freelookmousepos.x) * 100.0f * mouselookspeed * (1.0f - mousesmoothing);
-		if (Abs(lookchange.x) < 0.001f) lookchange.x = 0.0f;
-		if (Abs(lookchange.y) < 0.001f) lookchange.y = 0.0f;
-		if (lookchange.x != 0.0f or lookchange.y != 0.0f)
-		{
-			freelookrotation.x += lookchange.x * inverse;
-			freelookrotation.x = Clamp(freelookrotation.x, topangle, bottomangle);
-			freelookrotation.y += lookchange.y;
-			entity->SetRotation(freelookrotation, true);
-		}
-		freelookmousepos = newmousepos;
-	}
+        // Camera
+        auto camera = GetEntity()->As<Camera>();
+        if (camera == NULL)  RuntimeError("Spectator Component must be attached to the Camera entity type!");
+        ApplyCameraSettings(camera);
+        GetInput()->CenterCursor();
+        GetInput()->SetCursorHidden(true);
+        GetInput()->SetActiveSet("InGameControls");
 
-	void RelativeMouseLook()
-	{
-		if (lockmouse)
-		{
-			freelookstarted = false;
-			return;
-		}
+        freelookstarted = false;
+        Vec2 freelookmousepos = Vec2(0);
+        Vec2 lookchange = Vec2(0);
+        Vec3 freelookrotation = Vec3(0);
 
-		int inverse = 1;
-		auto entity = GetEntity();
-		if (GetInput()->GetSettingBool("Inverse Mouse")) inverse = -1;
+        // Properties
+        if (properties["lockmouse"].is_boolean()) lockmouse = properties["lockmouse"];
+        if (properties["allowmovement"].is_boolean()) allowmovement = properties["allowmovement"];
+        if (properties["movespeed"].is_number()) movespeed = properties["movespeed"];
+        if (properties["topangle"].is_number()) topangle = properties["topangle"];
+        if (properties["bottomangle"].is_number()) bottomangle = properties["bottomangle"];
 
-		auto window = GetInput()->GetWindow();
-		auto cx = Round((float)window->GetFramebuffer()->GetSize().x / 2);
-		auto cy = Round((float)window->GetFramebuffer()->GetSize().y / 2);
-		auto mpos = GetInput()->GetCursorFloatPosition();
-		window->SetMousePosition(cx, cy);
-		auto centerpos = GetInput()->GetCursorFloatPosition();
+        return true;
+    }
 
-		if (freelookstarted)
-		{
-			float looksmoothing = mousesmoothing;
-			float lookspeed = mouselookspeed / 10.0f;
+    virtual bool Save(table& properties, shared_ptr<Stream> binstream, shared_ptr<Map> scene, const SaveFlags flags)
+    {
+        // Properties
+        properties["lockmouse"] = lockmouse;
+        properties["allowmovement"] = allowmovement;
+        properties["movespeed"] = movespeed;
+        properties["topangle"] = topangle;
+        properties["bottomangle"] = bottomangle;
 
-			if (looksmoothing > 0.00f)
-			{
-				mpos.x = mpos.x * looksmoothing + freelookmousepos.x * (1 - looksmoothing);
-				mpos.y = mpos.y * looksmoothing + freelookmousepos.y * (1 - looksmoothing);
-			}
+        return true;
+    }
 
-			auto dx = (mpos.x - centerpos.x) * lookspeed;
-			auto dy = (mpos.y - centerpos.y) * lookspeed;
+    //This method will work with simple components
+    virtual shared_ptr<Component> Copy()
+    {
+        return std::make_shared<Spectator>(*this);
+    }
 
-			freelookrotation.x = freelookrotation.x + dy * inverse;
-			freelookrotation.x = Clamp(freelookrotation.x, topangle, bottomangle);
-			freelookrotation.y = freelookrotation.y + dx;
-			entity->SetRotation(freelookrotation, true);
-			freelookmousepos = Vec2((float)mpos.x, (float)mpos.y);
-		}
-		else
-		{
-			freelookstarted = true;
-			freelookrotation = entity->GetRotation(true);
-			freelookmousepos = Vec2(GetInput()->GetCursorFloatPosition().x, GetInput()->GetCursorFloatPosition().y);
-		}
-	}
+    virtual void Start()
+    {
+        Print("Attached component: " + QuoteWString(name));
 
-	virtual void UpdateStage()
-	{
-		auto window = GetInput()->GetWindow();
-		if (window == NULL) return;
+        BuildCrosshair();
 
-		auto entity = GetEntity();
-		if (entity == NULL) return;
+        Listen(EVENT_PAUSESTATE, GetProgram());
+        Listen(EVENT_GRAPHICSWINDOW, GetProgram());
+        Listen(EVENT_SETTINGCHANGED, GetProgram());
+        Listen(EVENT_CONSOLEEXECUTE, GetProgram());
+    }
 
-		// Camera look
-		mousesmoothing = GetInput()->GetSettingFloat("Mouse Smoothing", mousesmoothing);
-		mouselookspeed = GetInput()->GetSettingFloat("Mouse Look Speed", mouselookspeed);
-		const bool rawmouse = GetInput()->GetSettingBool("Raw Mouse", true);
-		if (rawmouse)
-			RawMouseLook();
-		else
-			RelativeMouseLook();
+    virtual bool ProcessEvent(const Event& e)
+    {
+        if (GetEntity())
+        {
+            auto camera = GetEntity()->As<Camera>();
+            if (camera) ProcessCameraEvents(e, camera);
+        }
 
-		// Movement
-		if (allowmovement)
-		{
-			float speed = movespeed / 60.0f;
-			if (GetInput()->Down("Sprint"))
-			{
-				speed *= 10.0f;
-			}
-			else if (GetInput()->Down("Crouch"))
-			{
-				speed *= 0.25f;
-			}
+        if (e.id == EVENT_PAUSESTATE)
+        {
+            const bool state = (bool)e.data;
+            GetInput()->CenterCursor();
+            GetInput()->SetCursorHidden(!state);
+            freelookstarted = false;
+        }
+        else if (e.id == EVENT_GRAPHICSWINDOW)
+        {
+            GetInput()->Flush();
+            GetInput()->CenterCursor();
+            freelookstarted = false;
 
-			if (GetInput()->Down("Climb")) entity->Translate(0, speed, 0);
-			if (GetInput()->Down("Desent")) entity->Translate(0, -speed, 0);
-			auto axis = GetInput()->Axis("Movement");
-			entity->Move(axis.x * speed, 0, axis.y * speed);
-		}
-	}
+            // Crosshair
+            hudcam->SetPosition(float(e.size.x) * 0.5f, float(e.size.y) * 0.5f);
+            sprite[0]->SetPosition((float)e.size.x / 2, (float)e.size.y / 2);
+            sprite[1]->SetPosition((float)e.size.x / 2, (float)e.size.y / 2 + 8);
+            sprite[2]->SetPosition((float)e.size.x / 2, (float)e.size.y / 2 - 8);
+            sprite[3]->SetPosition((float)e.size.x / 2 - 8, (float)e.size.y / 2);
+            sprite[4]->SetPosition((float)e.size.x / 2 + 8, (float)e.size.y / 2);
+        }
 
-	virtual void Update()
-    	{
-		if (GetInput()->Hit("Pause"))
-		{
-			GetStage()->Pause(!GetStage()->GetPaused());
-		}
+        return true;
+    }
 
-		GamePlayer::Update();
-    	}
+    void RawMouseLook()
+    {
+        auto entity = GetEntity();
+        if (lockmouse)
+        {
+            freelookstarted = false;
+            return;
+        }
 
-	//This method will work with simple components
-	virtual shared_ptr<Component> Copy()
-	{
-		return std::make_shared<CameraControls>(*this);
-	}
+        if (!freelookstarted)
+        {
+            freelookstarted = true;
+            freelookrotation = entity->GetRotation(true);
+            freelookmousepos = GetInput()->Axis("Camera");
+        }
 
-	virtual bool ProcessEvent(const Event& e)
-	{
-		if (e.id == EVENT_PAUSESTATE)
-		{
-			const bool state = (bool)e.data;
-			GetInput()->CenterCursor();
-			GetInput()->SetCursorHidden(!state);
-			freelookstarted = false;
-		}
-		else if (e.id == EVENT_GRAPHICSWINDOW)
-		{
-			GetInput()->Flush();
-			GetInput()->CenterCursor();
-			freelookstarted = false;
-		}
-		
-		return GamePlayer::ProcessEvent(e);
-	}
+        int inverse = 1;
+        if (GetInput()->GetSettingBool("Inverse Mouse")) inverse = -1;
+        float mousesmoothing = GetInput()->GetSettingFloat("Mouse Smoothing");
+        float mouselookspeed = GetInput()->GetSettingFloat("Mouse Look Speed");
 
-	virtual bool Load(table& properties, shared_ptr<Stream> binstream, shared_ptr<Map> scene, const LoadFlags flags)
-	{
-		if (properties["lockmouse"].is_boolean()) lockmouse = properties["lockmouse"];
-		if (properties["allowmovement"].is_boolean()) allowmovement = properties["allowmovement"];
-		if (properties["movespeed"].is_number()) movespeed = properties["movespeed"];
-		if (properties["topangle"].is_number()) topangle = properties["topangle"];
-		if (properties["bottomangle"].is_number()) bottomangle = properties["bottomangle"];
-	
-		return true;
-	}
-		
-	virtual bool Save(table& properties, shared_ptr<Stream> binstream, shared_ptr<Map> scene, const SaveFlags flags)
-	{
-		properties["lockmouse"] = lockmouse;
-		properties["allowmovement"] = allowmovement;
-		properties["topangle"] = topangle;
-		properties["bottomangle"] = bottomangle;
-	
-		return true;
-	}
+        auto newmousepos = GetInput()->Axis("Camera");
+        lookchange.x = lookchange.x * mousesmoothing + (newmousepos.y - freelookmousepos.y) * 100.0f * mouselookspeed * (1.0f - mousesmoothing);
+        lookchange.y = lookchange.y * mousesmoothing + (newmousepos.x - freelookmousepos.x) * 100.0f * mouselookspeed * (1.0f - mousesmoothing);
+        if (Abs(lookchange.x) < 0.001f) lookchange.x = 0.0f;
+        if (Abs(lookchange.y) < 0.001f) lookchange.y = 0.0f;
+        if (lookchange.x != 0.0f or lookchange.y != 0.0f)
+        {
+            freelookrotation.x += lookchange.x * inverse;
+            freelookrotation.x = Clamp(freelookrotation.x, topangle, bottomangle);
+            freelookrotation.y += lookchange.y;
+            entity->SetRotation(freelookrotation, true);
+        }
+        freelookmousepos = newmousepos;
+    }
+
+    void RelativeMouseLook()
+    {
+        if (lockmouse)
+        {
+            freelookstarted = false;
+            return;
+        }
+
+        int inverse = 1;
+        auto entity = GetEntity();
+        if (GetInput()->GetSettingBool("Inverse Mouse")) inverse = -1;
+        float mousesmoothing = GetInput()->GetSettingFloat("Mouse Smoothing");
+        float mouselookspeed = GetInput()->GetSettingFloat("Mouse Look Speed");
+
+        auto window = GetInput()->GetWindow();
+        auto cx = Round((float)window->GetFramebuffer()->GetSize().x / 2);
+        auto cy = Round((float)window->GetFramebuffer()->GetSize().y / 2);
+        auto mpos = GetInput()->GetCursorFloatPosition();
+        window->SetMousePosition(cx, cy);
+        auto centerpos = GetInput()->GetCursorFloatPosition();
+
+        if (freelookstarted)
+        {
+            float looksmoothing = mousesmoothing;
+            float lookspeed = mouselookspeed / 10.0f;
+
+            if (looksmoothing > 0.00f)
+            {
+                mpos.x = mpos.x * looksmoothing + freelookmousepos.x * (1 - looksmoothing);
+                mpos.y = mpos.y * looksmoothing + freelookmousepos.y * (1 - looksmoothing);
+            }
+
+            auto dx = (mpos.x - centerpos.x) * lookspeed;
+            auto dy = (mpos.y - centerpos.y) * lookspeed;
+
+            freelookrotation.x = freelookrotation.x + dy * inverse;
+            freelookrotation.x = Clamp(freelookrotation.x, topangle, bottomangle);
+            freelookrotation.y = freelookrotation.y + dx;
+            entity->SetRotation(freelookrotation, true);
+            freelookmousepos = Vec2((float)mpos.x, (float)mpos.y);
+        }
+        else
+        {
+            freelookstarted = true;
+            freelookrotation = entity->GetRotation(true);
+            freelookmousepos = Vec2(GetInput()->GetCursorFloatPosition().x, GetInput()->GetCursorFloatPosition().y);
+        }
+    }
+
+    virtual void UpdateStage()
+    {
+        // Camera look
+        const bool rawmouse = GetInput()->GetSettingBool("Raw Mouse", true);
+        if (rawmouse)
+            RawMouseLook();
+        else
+            RelativeMouseLook();
+    }
+
+    virtual void UpdateInput(shared_ptr<GameController> controller)
+    {
+        // Pause
+        if (controller->Hit("Pause"))
+        {
+            GetStage()->Pause(!GetStage()->GetPaused());
+        }
+
+        // Movement
+        if (allowmovement)
+        {
+            float speed = movespeed / 60.0f;
+            if (controller->Down("Sprint"))
+            {
+                speed *= 10.0f;
+            }
+            else if (controller->Down("Crouch"))
+            {
+                speed *= 0.25f;
+            }
+
+            if (GetInput()->Down("Climb")) GetEntity()->Translate(0, speed, 0);
+            if (GetInput()->Down("Desent")) GetEntity()->Translate(0, -speed, 0);
+            auto axis = GetInput()->Axis("Movement");
+            GetEntity()->Move(axis.x * speed, 0, axis.y * speed);
+        }
+    }
 };
 ```
 
