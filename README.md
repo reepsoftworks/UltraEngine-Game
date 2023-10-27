@@ -9,7 +9,7 @@ Application source code for turning any [Ultra Engine](https://www.ultraengine.c
 - Built-In Settings: Engine settings and keybindings are handled and can be easily changed with the the built-in settings window.
 - Event Based Console: A simple but flexible console system for invoking additional functionality with components.
 - Sound Managment: Load sound via JSON scripts with the GameSpeaker class.
-- 
+
 This requires no additional dependencies outside the game engine and it's designed to be isolated within it's own folder. Getting started is easy! Drag and drop the "Game" folder (Source/Game) into your projects "Source" directory and add all files to your project. You'll also need to copy the "config.json" file as it's needed for the system to know the details of your application such as the name and appid (if applicable).
 
 Set your main.cpp file to look like the below:
