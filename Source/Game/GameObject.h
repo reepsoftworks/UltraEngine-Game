@@ -20,9 +20,8 @@ namespace UltraEngine::Game
 		shared_ptr<Stage> GetStage();
 		shared_ptr<GameController> GetInput();
 
-		void Update();
-		virtual void OnPerTick() {};
-		virtual void UpdateStage() {};
+		//virtual void OnPerTick() {};
+		//virtual void UpdateStage() {};
 
 	public:
 		GameObject();
@@ -38,9 +37,6 @@ namespace UltraEngine::Game
 	{
 	protected:
 		virtual ~GamePlayer();
-
-		void Update();
-		virtual void UpdateInput(shared_ptr<GameController> controller) {};
 
 		shared_ptr<Camera> InitCamera();
 		void ApplyCameraSettings(shared_ptr<Camera> camera);

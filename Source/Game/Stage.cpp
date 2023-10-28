@@ -37,6 +37,9 @@ namespace UltraEngine::Game
 		pausestate = false;
 		startmaptimer = NULL;
 
+		// Clear all canvases
+		canvases.clear();
+
 		// Set the menu world as the active world.
 		activeworld = menuworld;
 	}
@@ -54,6 +57,9 @@ namespace UltraEngine::Game
 
 		// Sleep for a bit.
 		Sleep(500);
+
+		// Clear all canvases
+		canvases.clear();
 
 		if (gamescene != NULL)
 		{
@@ -143,6 +149,9 @@ namespace UltraEngine::Game
 			if (loadingscreen) loadingscreen->ShowClearScreen();
 			GetProgram()->Render(menuworld);
 			activeworld = menuworld;
+
+			// Clear all canvases
+			canvases.clear();
 
 			gameworld->SetEnvironmentMap(NULL);
 			gameworld->SetEnvironmentMap(NULL, UltraEngine::ENVIRONMENTMAP_DIFFUSE);

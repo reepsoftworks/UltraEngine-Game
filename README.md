@@ -137,17 +137,17 @@ int main(int argc, const char* argv[])
 
 The days of using Window::KeyHit() is over! Every input command is an action and can be seperated in action sets. 
 ```
-			if (GetInput()->Down("Sprint"))
-			{
-				speed *= 10.0f;
-			}
+	if (GetInput()->Down("Sprint"))
+	{
+	    speed *= 10.0f;
+	}
 ```
 
 Keys like W, A, S and D can be assigned to an axis making your movement code compatible with joysticks if you chose to opt-in for gamepad support.
 ```
-			const float speed = 10.0f;
-			auto axis = GetInput()->Axis("Movement");
-			entity->Move(axis.x * speed, 0, axis.y * speed);
+	const float speed = 10.0f;
+	auto axis = GetInput()->Axis("Movement");
+	entity->Move(axis.x * speed, 0, axis.y * speed);
 ```
 
 You can seperate your actions into sets (Like running, swiming, flying, etc) and have "global" actions that will always register regardless on what action set is active. Changing action sets is as simple as using GameController::SetActiveSet().
@@ -157,11 +157,10 @@ You can seperate your actions into sets (Like running, swiming, flying, etc) and
 Your components can be 100% isolated from the game system. However, consider using the included GameObject and GamePlayer classes when making your components.
 
 The reasons for doing so are:
-1. There is a new function called UpdateStage() which is called everytime the Stage is updated (When the game isn't paused). Update() still gets called by the engine regardless if the game is paused or not. Rule of thumb is to have Update() before input calls and UpdateStage() be for everything else.
-2. Direct return functions for getting the Stage and Game Controller.
-3. GamePlayer has code in ProcessEvent() to handle when the settings are changed.
+1. Direct return functions for getting the Stage and Game Controller.
+2. GamePlayer has code in ProcessEvent() to handle when the settings are changed.
 
-Here's what the CameraControls.hpp can look like when intergrated with the GamePlayer class. 
+Here's an example Spectator class:
 ```
 #pragma once
 #include "UltraEngine.h"
@@ -178,7 +177,7 @@ class Spectator : public GamePlayer
     Vec3 freelookrotation;
 
     // Crosshair
-    shared_ptr<Camera> hudcam;
+    shared_ptr<Canvas> canvas;
     std::array<shared_ptr<Sprite>, 5> sprite;
 public:
     bool lockmouse{ false };
@@ -196,10 +195,7 @@ public:
     {
         auto sz = GetProgram()->GetFramebufferSize();
         auto world = GetStage()->GameWorld();
-        hudcam = CreateCamera(world, PROJECTION_ORTHOGRAPHIC);
-        hudcam->SetRenderLayers(1);
-        hudcam->SetClearMode(CLEAR_DEPTH);
-        hudcam->SetPosition(float(sz.x) * 0.5f, float(sz.y) * 0.5f);
+        canvas = GetCanvas(world, RENDERLAYER_HUD);
 
         sprite[0] = CreateSprite(world, 1.0f, 1.0f);
         auto mat = CreateMaterial();
@@ -211,23 +207,23 @@ public:
             mat = NULL;
         }
         sprite[0]->SetPosition((float)sz.x / 2, (float)sz.y / 2);
-        sprite[0]->SetRenderLayers(1);
+        RenderToCanvas(sprite[0], canvas);
 
         sprite[1] = sprite[0]->Instantiate(world)->As<Sprite>();
         sprite[1]->SetPosition((float)sz.x / 2, (float)sz.y / 2 + 8);
-        sprite[1]->SetRenderLayers(1);
+        RenderToCanvas(sprite[1], canvas);
 
         sprite[2] = sprite[0]->Instantiate(world)->As<Sprite>();
         sprite[2]->SetPosition((float)sz.x / 2, (float)sz.y / 2 - 8);
-        sprite[2]->SetRenderLayers(1);
+        RenderToCanvas(sprite[2], canvas);
 
         sprite[3] = sprite[0]->Instantiate(world)->As<Sprite>();
         sprite[3]->SetPosition((float)sz.x / 2 - 8, (float)sz.y / 2);
-        sprite[3]->SetRenderLayers(1);
+        RenderToCanvas(sprite[3], canvas);
 
         sprite[4] = sprite[0]->Instantiate(world)->As<Sprite>();
         sprite[4]->SetPosition((float)sz.x / 2 + 8, (float)sz.y / 2);
-        sprite[4]->SetRenderLayers(1);
+        RenderToCanvas(sprite[4], canvas);
     }
 
     virtual bool Load(table& properties, shared_ptr<Stream> binstream, shared_ptr<Map> scene, const LoadFlags flags)
@@ -285,6 +281,7 @@ public:
         Listen(EVENT_GRAPHICSWINDOW, GetProgram());
         Listen(EVENT_SETTINGCHANGED, GetProgram());
         Listen(EVENT_CONSOLEEXECUTE, GetProgram());
+        Listen(EVENT_KEYDOWN, GetProgram());
     }
 
     virtual bool ProcessEvent(const Event& e)
@@ -295,7 +292,21 @@ public:
             if (camera) ProcessCameraEvents(e, camera);
         }
 
-        if (e.id == EVENT_PAUSESTATE)
+        if (e.id == EVENT_CONSOLEEXECUTE)
+        {
+            auto line = e.text.Split(" ");
+            auto cmd = line[0].ToString();
+            if (line.size() > 1 && !line[1].empty())
+            {
+                if (cmd == "crosshair")
+                {
+                    bool hide = (bool)line[1].ToInt();
+                    canvas->SetHidden(!hide);
+                    Print(QuoteString(cmd) + " has been set to: " + line[1]);
+                }
+            }
+        }
+        else if (e.id == EVENT_PAUSESTATE)
         {
             const bool state = (bool)e.data;
             GetInput()->CenterCursor();
@@ -309,12 +320,19 @@ public:
             freelookstarted = false;
 
             // Crosshair
-            hudcam->SetPosition(float(e.size.x) * 0.5f, float(e.size.y) * 0.5f);
+            canvas->Reposition(e.size);
             sprite[0]->SetPosition((float)e.size.x / 2, (float)e.size.y / 2);
             sprite[1]->SetPosition((float)e.size.x / 2, (float)e.size.y / 2 + 8);
             sprite[2]->SetPosition((float)e.size.x / 2, (float)e.size.y / 2 - 8);
             sprite[3]->SetPosition((float)e.size.x / 2 - 8, (float)e.size.y / 2);
             sprite[4]->SetPosition((float)e.size.x / 2 + 8, (float)e.size.y / 2);
+        }
+        else if (e.id == EVENT_KEYDOWN)
+        {
+            if (GetInput()->Hit("Pause"))
+            {
+                GetStage()->Pause(!GetStage()->GetPaused());
+            }
         }
 
         return true;
@@ -405,33 +423,17 @@ public:
         }
     }
 
-    virtual void UpdateStage()
+    virtual void UpdateInput()
     {
-        // Camera look
-        const bool rawmouse = GetInput()->GetSettingBool("Raw Mouse", true);
-        if (rawmouse)
-            RawMouseLook();
-        else
-            RelativeMouseLook();
-    }
-
-    virtual void UpdateInput(shared_ptr<GameController> controller)
-    {
-        // Pause
-        if (controller->Hit("Pause"))
-        {
-            GetStage()->Pause(!GetStage()->GetPaused());
-        }
-
         // Movement
         if (allowmovement)
         {
             float speed = movespeed / 60.0f;
-            if (controller->Down("Sprint"))
+            if (GetInput()->Down("Sprint"))
             {
                 speed *= 10.0f;
             }
-            else if (controller->Down("Crouch"))
+            else if (GetInput()->Down("Crouch"))
             {
                 speed *= 0.25f;
             }
@@ -441,6 +443,18 @@ public:
             auto axis = GetInput()->Axis("Movement");
             GetEntity()->Move(axis.x * speed, 0, axis.y * speed);
         }
+    }
+
+    virtual void Update()
+    {
+        // Camera look
+        const bool rawmouse = GetInput()->GetSettingBool("Raw Mouse", true);
+        if (rawmouse)
+            RawMouseLook();
+        else
+            RelativeMouseLook();
+
+        UpdateInput();
     }
 };
 ```

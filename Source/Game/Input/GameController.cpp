@@ -546,7 +546,7 @@ namespace UltraEngine::Game
 
 	float GameController::GetSettingFloat(const String& setting, const float defaultvalue)
 	{
-		if (config["settings"][setting].is_float()) return config["settings"][setting];
+		if (config["settings"][setting].is_number()) return config["settings"][setting];
 		return defaultvalue;
 	}
 

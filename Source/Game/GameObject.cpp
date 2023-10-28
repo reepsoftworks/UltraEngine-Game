@@ -19,18 +19,6 @@ namespace UltraEngine::Game
 	{
 	}
 
-	void GameObject::Update()
-	{
-		// Fire this function always.
-		OnPerTick();
-
-		// Don't call UpdateStage if the stage is paused.
-		if (!GetStage()->GetPaused())
-		{
-			UpdateStage();
-		}
-	}
-
 	shared_ptr<Stage> GameObject::GetStage()
 	{
 		return GetProgram()->stage;
@@ -45,14 +33,6 @@ namespace UltraEngine::Game
 	GamePlayer::~GamePlayer()
 	{
 		GetProgram()->pausewhenunselected = false;
-	}
-
-	void GamePlayer::Update()
-	{
-		// Update input
-		UpdateInput(GetProgram()->gamecontroller);
-		
-		GameObject::Update();
 	}
 
 	shared_ptr<Camera> GamePlayer::InitCamera()
