@@ -45,21 +45,22 @@ namespace UltraEngine::Game
 		return camera->GetRenderLayers();
 	}
 
-	std::map<int, shared_ptr<Canvas>> canvases;
+	std::map<int, std::weak_ptr<Canvas>> canvases;
 	shared_ptr<Canvas> GetCanvas(shared_ptr<World> world, const int renderlayer)
 	{
-		if (canvases[renderlayer] == NULL)
+		auto canvas = canvases[renderlayer].lock();
+		if (canvas == NULL)
 		{
-			canvases[renderlayer] = std::make_shared<Canvas>();
+			canvas = std::make_shared<Canvas>();
 
 			auto sz = GetProgram()->GetFramebufferSize();
-			canvases[renderlayer]->camera = CreateCamera(world, PROJECTION_ORTHOGRAPHIC);
-			canvases[renderlayer]->camera->SetRenderLayers(renderlayer);
-			canvases[renderlayer]->camera->SetClearMode(CLEAR_DEPTH);
-			canvases[renderlayer]->camera->SetPosition(float(sz.x) * 0.5f, float(sz.y) * 0.5f);
+			canvas->camera = CreateCamera(world, PROJECTION_ORTHOGRAPHIC);
+			canvas->camera->SetRenderLayers(renderlayer);
+			canvas->camera->SetClearMode(CLEAR_DEPTH);
+			canvas->camera->SetPosition(float(sz.x) * 0.5f, float(sz.y) * 0.5f);
 		}
 
-		return canvases[renderlayer];
+		return canvas;
 	}
 
 	void RenderToCanvas(shared_ptr<Entity> entity, shared_ptr<Canvas> canvas)

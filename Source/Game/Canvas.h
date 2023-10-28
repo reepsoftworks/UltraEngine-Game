@@ -29,7 +29,7 @@ namespace UltraEngine::Game
 		friend void RenderToCanvas(shared_ptr<Entity> entity, shared_ptr<Canvas> canvas);
 	};
 
-	extern std::map<int, shared_ptr<Canvas>> canvases;
+	extern std::map<int, std::weak_ptr<Canvas>> canvases;
 	extern shared_ptr<Canvas> GetCanvas(shared_ptr<World> world, const int renderlayer);
 	extern void RenderToCanvas(shared_ptr<Entity> entity, shared_ptr<Canvas> canvas);
 }
