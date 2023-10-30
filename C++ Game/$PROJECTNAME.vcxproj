@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>$PROJECTNAME</RootNamespace>
+    <UseNativeEnvironment>true</UseNativeEnvironment>
+    <ProjectName>$PROJECTNAME</ProjectName>
+    <ProjectGuid>{D9B8506C-503D-47C2-8807-679EB8527036}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PropertySheet.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)\</OutDir>
+    <IntDir>.vs\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)_d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IntDir>.vs\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;NOMINMAX;_HAS_STD_BYTE=0;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;</PreprocessorDefinitions>
+      <ConformanceMode>false</ConformanceMode>
+      <AdditionalIncludeDirectories>$(UltraEnginePath)\Include;$(UltraEnginePath)\Include\Libraries\zlib;$(UltraEnginePath)\Include\Libraries\Box2D;$(UniversalCRT_LibraryPath);$(UltraEnginePath)\Include\Libraries\freetype\include;$(UltraEnginePath)\Include\Libraries\OpenAL\include;$(UltraEnginePath)\Include\Libraries\RecastNavigation\RecastDemo\Include;$(UltraEnginePath)\Include\Libraries\RecastNavigation\DetourCrowd\Include;$(UltraEnginePath)\Include\Libraries\RecastNavigation\DetourTileCache\Include;$(UltraEnginePath)\Include\Libraries\RecastNavigation\DebugUtils\Include;$(UltraEnginePath)\Include\Libraries\RecastNavigation\Recast\Include;$(UltraEnginePath)\Include\Libraries\RecastNavigation\Detour\Include;$(UltraEnginePath)\Include\Libraries\sol3\include;$(UltraEnginePath)\Include\Libraries\Lua\src;$(UltraEnginePath)\Include\Libraries\enet\include;$(UltraEnginePath)\Include\Libraries\newton\sdk\dTinyxml;$(UltraEnginePath)\Include\Libraries\newton\sdk\dNewton\dExtensions;$(UltraEnginePath)\Include\Libraries\newton\sdk\dNewton\dIkSolver;$(UltraEnginePath)\Include\Libraries\newton\sdk\dNewton\dJoints;$(UltraEnginePath)\Include\Libraries\newton\sdk\dNewton\dModels\dVehicle;$(UltraEnginePath)\Include\Libraries\newton\sdk\dNewton\dModels\dCharacter;$(UltraEnginePath)\Include\Libraries\newton\sdk\dNewton\dModels;$(UltraEnginePath)\Include\Libraries\newton\sdk\dNewton\dParticles;$(UltraEnginePath)\Include\Libraries\newton\sdk\dNewton;$(UltraEnginePath)\Include\Libraries\newton\sdk\dCore;$(UltraEnginePath)\Include\Libraries\newton\sdk\dCollision;$(UltraEnginePath)\Include\Libraries\NewtonDynamics\sdk\dVehicle\dMultiBodyVehicle;$(UltraEnginePath)\Include\Libraries\NewtonDynamics\sdk\dVehicle;$(UltraEnginePath)\Include\Libraries\NewtonDynamics\sdk\dMath;$(UltraEnginePath)\Include\Libraries\NewtonDynamics\sdk\dgCore;$(UltraEnginePath)\Include\Libraries\NewtonDynamics\sdk\dgNewton;$(UltraEnginePath)\Include\Libraries\NewtonDynamics\sdk\dAnimation;$(UltraEnginePath)\Include\Libraries\NewtonDynamics\sdk\dgTimeTracker;$(UltraEnginePath)\Include\Libraries\NewtonDynamics\sdk\dContainers;$(UltraEnginePath)\Include\Libraries\NewtonDynamics\sdk\dCustomJoints</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeaderFile>UltraEngine.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <FloatingPointModel>Fast</FloatingPointModel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
+      <SectionAlignment>
+      </SectionAlignment>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
+      <AdditionalLibraryDirectories>$(UltraEnginePath)\Library;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>UltraEngine_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ProgramDatabaseFile>.vs\$(Configuration)\$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary>.vs\$(Configuration)\$(TargetName).lib</ImportLibrary>
+    </Link>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)\Tools\Preprocessor.exe +path "../"</Command>
+      <Message>Component Preprocessor</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NOMINMAX</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NOMINMAX;_HAS_STD_BYTE=0;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;</PreprocessorDefinitions>
+      <ConformanceMode>false</ConformanceMode>
+      <AdditionalIncludeDirectories>$(UltraEnginePath)\Include;$(UltraEnginePath)\Include\Libraries\zlib;$(UltraEnginePath)\Include\Libraries\Box2D;$(UniversalCRT_LibraryPath);$(UltraEnginePath)\Include\Libraries\freetype\include;$(UltraEnginePath)\Include\Libraries\OpenAL\include;$(UltraEnginePath)\Include\Libraries\RecastNavigation\RecastDemo\Include;$(UltraEnginePath)\Include\Libraries\RecastNavigation\DetourCrowd\Include;$(UltraEnginePath)\Include\Libraries\RecastNavigation\DetourTileCache\Include;$(UltraEnginePath)\Include\Libraries\RecastNavigation\DebugUtils\Include;$(UltraEnginePath)\Include\Libraries\RecastNavigation\Recast\Include;$(UltraEnginePath)\Include\Libraries\RecastNavigation\Detour\Include;$(UltraEnginePath)\Include\Libraries\sol3\include;$(UltraEnginePath)\Include\Libraries\Lua\src;$(UltraEnginePath)\Include\Libraries\enet\include;$(UltraEnginePath)\Include\Libraries\newton\sdk\dTinyxml;$(UltraEnginePath)\Include\Libraries\newton\sdk\dNewton\dExtensions;$(UltraEnginePath)\Include\Libraries\newton\sdk\dNewton\dIkSolver;$(UltraEnginePath)\Include\Libraries\newton\sdk\dNewton\dJoints;$(UltraEnginePath)\Include\Libraries\newton\sdk\dNewton\dModels\dVehicle;$(UltraEnginePath)\Include\Libraries\newton\sdk\dNewton\dModels\dCharacter;$(UltraEnginePath)\Include\Libraries\newton\sdk\dNewton\dModels;$(UltraEnginePath)\Include\Libraries\newton\sdk\dNewton\dParticles;$(UltraEnginePath)\Include\Libraries\newton\sdk\dNewton;$(UltraEnginePath)\Include\Libraries\newton\sdk\dCore;$(UltraEnginePath)\Include\Libraries\newton\sdk\dCollision;$(UltraEnginePath)\Include\Libraries\NewtonDynamics\sdk\dVehicle\dMultiBodyVehicle;$(UltraEnginePath)\Include\Libraries\NewtonDynamics\sdk\dVehicle;$(UltraEnginePath)\Include\Libraries\NewtonDynamics\sdk\dMath;$(UltraEnginePath)\Include\Libraries\NewtonDynamics\sdk\dgCore;$(UltraEnginePath)\Include\Libraries\NewtonDynamics\sdk\dgNewton;$(UltraEnginePath)\Include\Libraries\NewtonDynamics\sdk\dAnimation;$(UltraEnginePath)\Include\Libraries\NewtonDynamics\sdk\dgTimeTracker;$(UltraEnginePath)\Include\Libraries\NewtonDynamics\sdk\dContainers;$(UltraEnginePath)\Include\Libraries\NewtonDynamics\sdk\dCustomJoints</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeaderFile>UltraEngine.h</PrecompiledHeaderFile>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <FloatingPointModel>Fast</FloatingPointModel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalOptions>/OPT:NOICF,NOLBR %(AdditionalOptions)</AdditionalOptions>
+      <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
+      <AdditionalLibraryDirectories>$(UltraEnginePath)\Library;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>UltraEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>.vs\$(Configuration)\$(TargetName).lib</ImportLibrary>
+    </Link>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)\Tools\Preprocessor.exe +path "../"</Command>
+      <Message>Component Preprocessor</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Game\Canvas.cpp" />
+    <ClCompile Include="Source\Game\CustomWidgets\FloatSlider.cpp" />
+    <ClCompile Include="Source\Game\CustomWidgets\InputBindPanel.cpp" />
+    <ClCompile Include="Source\Game\CustomWidgets\KeyBindButton.cpp" />
+    <ClCompile Include="Source\Game\CustomWidgets\NumberSlider.cpp" />
+    <ClCompile Include="Source\Game\CustomWidgets\ResoultionComboBox.cpp" />
+    <ClCompile Include="Source\Game\CustomWidgets\ScrollPanel.cpp" />
+    <ClCompile Include="Source\Game\CustomWidgets\Spinner.cpp" />
+    <ClCompile Include="Source\Game\Game.cpp" />
+    <ClCompile Include="Source\Game\GameLuaBindings.cpp" />
+    <ClCompile Include="Source\Game\GameObject.cpp" />
+    <ClCompile Include="Source\Game\Input\ButtonCode.cpp" />
+    <ClCompile Include="Source\Game\Input\GameController.cpp" />
+    <ClCompile Include="Source\Game\Input\Input.cpp" />
+    <ClCompile Include="Source\Game\LoadingScreen.cpp" />
+    <ClCompile Include="Source\Game\Sound\GameSpeaker.cpp" />
+    <ClCompile Include="Source\Game\Sound\SoundFunctions.cpp" />
+    <ClCompile Include="Source\Game\Sound\SoundProfile.cpp" />
+    <ClCompile Include="Source\Game\Stage.cpp" />
+    <ClCompile Include="Source\Game\UIElement.cpp" />
+    <ClCompile Include="Source\Game\UIElements\ConsoleWindow.cpp" />
+    <ClCompile Include="Source\Game\UIElements\GraphicsWindow.cpp" />
+    <ClCompile Include="Source\Game\UIElements\SettingsWindow.cpp" />
+    <ClCompile Include="Source\Game\UIElements\SplashScreen.cpp" />
+    <ClCompile Include="Source\Game\Utilities\CheckArgument.cpp" />
+    <ClCompile Include="Source\Game\Utilities\MessageBox.cpp" />
+    <ClCompile Include="Source\Game\Utilities\RandomNumber.cpp" />
+    <ClCompile Include="Source\Game\Utilities\StringFunctions.cpp" />
+    <ClCompile Include="Source\Game\Utilities\SystemTime.cpp" />
+    <ClCompile Include="Source\Game\Utilities\Win32System.cpp" />
+    <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\UltraEngine.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Game\Canvas.h" />
+    <ClInclude Include="Source\Game\CustomEvents.h" />
+    <ClInclude Include="Source\Game\CustomWidgets\FloatSlider.h" />
+    <ClInclude Include="Source\Game\CustomWidgets\InputBindPanel.h" />
+    <ClInclude Include="Source\Game\CustomWidgets\KeyBindButton.h" />
+    <ClInclude Include="Source\Game\CustomWidgets\NumberSlider.h" />
+    <ClInclude Include="Source\Game\CustomWidgets\ResoultionComboBox.h" />
+    <ClInclude Include="Source\Game\CustomWidgets\ScrollPanel.h" />
+    <ClInclude Include="Source\Game\CustomWidgets\Spinner.h" />
+    <ClInclude Include="Source\Game\Game.h" />
+    <ClInclude Include="Source\Game\GameLuaBindings.h" />
+    <ClInclude Include="Source\Game\GameObject.h" />
+    <ClInclude Include="Source\Game\Input\ButtonCode.h" />
+    <ClInclude Include="Source\Game\Input\GameController.h" />
+    <ClInclude Include="Source\Game\Input\Input.h" />
+    <ClInclude Include="Source\Game\LoadingScreen.h" />
+    <ClInclude Include="Source\Game\Sound\GameSpeaker.h" />
+    <ClInclude Include="Source\Game\Sound\SoundFunctions.h" />
+    <ClInclude Include="Source\Game\Sound\SoundProfile.h" />
+    <ClInclude Include="Source\Game\Stage.h" />
+    <ClInclude Include="Source\Game\UIElement.h" />
+    <ClInclude Include="Source\Game\UIElements\ConsoleWindow.h" />
+    <ClInclude Include="Source\Game\UIElements\GraphicsWindow.h" />
+    <ClInclude Include="Source\Game\UIElements\SettingsWindow.h" />
+    <ClInclude Include="Source\Game\UIElements\SplashScreen.h" />
+    <ClInclude Include="Source\Game\Utilities\CheckArgument.h" />
+    <ClInclude Include="Source\Game\Utilities\MessageBox.h" />
+    <ClInclude Include="Source\Game\Utilities\RandomNumber.h" />
+    <ClInclude Include="Source\Game\Utilities\StringFunctions.h" />
+    <ClInclude Include="Source\Game\Utilities\SystemTime.h" />
+    <ClInclude Include="Source\Game\Utilities\Win32System.h" />
+    <ClInclude Include="Source\RegisterComponents.h" />
+    <ClInclude Include="Source\resource.h" />
+    <ClInclude Include="Source\targetver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Source\project.rc" />
+    <ResourceCompile Include="Source\gameicon.ico" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

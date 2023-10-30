@@ -1,0 +1,45 @@
+{
+    "appTitle": "$PROJECTNAME",
+    "appAuthor": "Your Company Here",
+    "appVersion": "1.0.0",
+    "appID": 480,
+    "scriptsPath": "Scripts",
+    "pluginsPath": "Plugins",
+    "addonsPath": "Addons",
+    "colorSchemesPath": "UI/Color Schemes",
+    "startMap": "",
+    "defaultSettings":
+    {
+        "darkColorScheme": "dark.json",
+        "lightColorScheme": "light.json",
+        "pluginFiles":
+        [
+            "Basis",
+            "FITextureLoader",
+            "ISPCTexComp"
+        ],
+        "packageFiles":
+        [
+        ],
+        "splashScreen":
+        {
+            "delay": 0,
+            "noSplash": false,
+            "background": "UI/Splash/samurai.dds",
+            "stripColor": [0.95, 0.59, 0.18, 1.0],
+            "copyright": "2023",
+            "logo": "UI/Splash/ultralogo.dds"
+        },
+        "clearScreen":
+        {
+            "logo": "UI/Icons/ultraengine.svg",
+            "logoScale": 1.5,
+            "backgroundColor": [0.125, 0.125, 0.125, 1.0]
+        },
+        "loadingScreen":
+        {
+            "backgroundImage": "UI/Loading Screens/loadingscreen_default.dds",
+            "loadingIcon": "UI/Loading Screens/loadingicon_default.dds"
+        }
+    }
+}
