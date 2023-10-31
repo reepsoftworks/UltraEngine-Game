@@ -10,7 +10,9 @@ Application source code for turning any [Ultra Engine](https://www.ultraengine.c
 - Event Based Console: A simple but flexible console system for invoking additional functionality with components.
 - Sound Managment: Load sound via JSON scripts with the GameSpeaker class.
 
-This requires no additional dependencies outside the game engine and it's designed to be isolated within it's own folder. Getting started is easy! Copy the "C++ Game" folder into *[UltraEngineInstallPath]/Templates* Create a new project using the newly installed template.
+This requires no additional dependencies outside the game engine and it's designed to be isolated within it's own folder. Getting started is easy! Run the "Install Template" batch file as administrator and the script will install (and update) to the engine's template directory. Then you'll be able to create a new project using the newly installed template.
+
+*The default location is set to C:\Program Files\Ultra Engine. If you've installed Ultra Engine to a diffrent location, edit [ULTRAENGINEPATH] in the batch file to where you've installed the engine.*
 
 **NOTE: You may get an error regarding the Component Preprocessor (error MSB3073: :VCEnd" exited with code 9009). Windows may be blocking the direct execution because it's seen as a foreign appm Manually execute the exe *Tools/Preprocessor.exe* and tell Windows UAC to trust it.**
 
