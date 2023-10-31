@@ -12,9 +12,11 @@ Application source code for turning any [Ultra Engine](https://www.ultraengine.c
 
 This requires no additional dependencies outside the game engine and it's designed to be isolated within it's own folder. Getting started is easy! Copy the "C++ Game" folder into *[UltraEngineInstallPath]/Templates* Create a new project using the newly installed template.
 
+**NOTE: You may get an error regarding the Component Preprocessor (error MSB3073: :VCEnd" exited with code 9009). Windows may be blocking the direct execution because it's seen as a foreign appm Manually execute the exe *Tools/Preprocessor.exe* and tell Windows UAC to trust it.**
+
 You can also preform a manual install by drag and droping the "Game" folder (C++ Game/Source/Game) into your projects "Source" directory and add all files to your project. You'll also need to copy the "config.json" file as it's needed for the system to know the details of your application such as the name and appid (if applicable).
 
-Set your main.cpp file to look like the below:
+Then set your main.cpp file to look like the below:
 ```
 #include "UltraEngine.h"
 #include "Game/Game.h"

@@ -113,9 +113,32 @@ bool SetWindowTitlebarTheme(shared_ptr<Window> source, const TitlebarTheme theme
 void CallCMDWindow()
 {
 #if defined (_WIN32)
-    AllocConsole();
-    freopen("conin$", "r", stdin);
-    freopen("conout$", "w", stdout);
-    freopen("conout$", "w", stderr);
+    if (!AttachConsole(ATTACH_PARENT_PROCESS))
+    {
+        if (AllocConsole())
+        {
+            freopen("conin$", "r", stdin);
+            freopen("conout$", "w", stdout);
+            freopen("conout$", "w", stderr);
+        }
+    }
+    else
+    {
+        auto consoleHandleOut = GetStdHandle(STD_OUTPUT_HANDLE);
+        auto consoleHandleIn = GetStdHandle(STD_INPUT_HANDLE);
+        auto consoleHandleErr = GetStdHandle(STD_ERROR_HANDLE);
+        if (consoleHandleOut != INVALID_HANDLE_VALUE) {
+            freopen("conout$", "w", stdout);
+            setvbuf(stdout, NULL, _IONBF, 0);
+        }
+        if (consoleHandleIn != INVALID_HANDLE_VALUE) {
+            freopen("conin$", "r", stdin);
+            setvbuf(stdin, NULL, _IONBF, 0);
+        }
+        if (consoleHandleErr != INVALID_HANDLE_VALUE) {
+            freopen("conout$", "w", stderr);
+            setvbuf(stderr, NULL, _IONBF, 0);
+        }
+    }
 #endif
 }

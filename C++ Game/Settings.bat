@@ -1,2 +1,2 @@
 @echo off
-UltraGame.exe -settings
+$PROJECTNAME.exe -settings

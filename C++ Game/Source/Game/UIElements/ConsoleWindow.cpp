@@ -155,16 +155,19 @@ namespace UltraEngine::Game
 			if (e.source == textfield_entry || e.source == button_send)
 			{
 				auto cmd = e.text.ToString();
-				textarea_log->AddText("] " + cmd + "\n");
-				textfield_entry->SetText("");
-				textfield_entry->Activate();
+				if (!cmd.empty())
+				{
+					textarea_log->AddText("] " + cmd + "\n");
+					textfield_entry->SetText("");
+					textfield_entry->Activate();
 
-				// Add to History
-				history.push_back(cmd);
-				historyindex = history.size();
+					// Add to History
+					history.push_back(cmd);
+					historyindex = history.size();
 
-				// Call the event!
-				EmitEvent(EVENT_CONSOLEEXECUTE, GetProgram(), 0, 0, 0, 0, 0, NULL, cmd);
+					// Call the event!
+					EmitEvent(EVENT_CONSOLEEXECUTE, GetProgram(), 0, 0, 0, 0, 0, NULL, cmd);
+				}
 			}
 		}
 		return true;

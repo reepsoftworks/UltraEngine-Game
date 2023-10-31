@@ -376,7 +376,16 @@ namespace UltraEngine::Game
             gamecontroller->AttachWindow(game->window);
 
             // Create Console Window
-            if (consolemode) console = CreateConsoleWindow(game->window);
+            if (consolemode)
+            {
+                console = CreateConsoleWindow(game->window);
+#if defined (_WIN32)
+                // Hide the console if CMD is enabled. Show the console it if CMD is hidden.
+                console->SetHidden(CheckArgument(GetProgram()->commandline, CFLAG_CMD));
+#else
+                console->SetHidden(false);
+#endif
+            }
 
             // Create stage
             stage = CreateStage();
@@ -523,7 +532,25 @@ namespace UltraEngine::Game
 
     void Program::Terminate()
     {
-        EmitEvent(EVENT_QUIT);
+        if (stage)
+        {
+            auto pausestate = stage->GetPaused();
+            stage->Pause(true);
+
+            auto answer = MessageContinue("Terminate", "Do you wish to terminate this application?");
+            if (answer == MESSAGE_ID_YES)
+            {
+                EmitEvent(EVENT_QUIT);
+            }
+            else
+            {
+                stage->Pause(pausestate);
+            }       
+        }
+        else
+        {
+            EmitEvent(EVENT_QUIT);
+        }
     }
 
     bool Program::ProcessEvent(const Event& e)
