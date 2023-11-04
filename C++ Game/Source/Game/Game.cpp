@@ -59,6 +59,11 @@ namespace UltraEngine::Game
                 SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
             }
 #endif
+            if (program->consolelog != NULL)
+            {
+                program->consolelog->WriteWLine(e.text);
+            }
+
             if (program->log != NULL)
             {
                 auto time = TimeStamp();
@@ -90,6 +95,7 @@ namespace UltraEngine::Game
         stage = NULL;
         luaapp = false;
         pausewhenunselected = false;
+        consolemode = false;
 
         Initialized = false;
 	}
@@ -99,9 +105,12 @@ namespace UltraEngine::Game
         if (Initialized)
             return true;
 
+        const bool editormode = CheckArgument(GetProgram()->commandline, CFLAG_EDITOR);
+
+
         // Start CMD window if flag is set and if we're on Windows.
 #if defined (_WIN32)
-        if (CheckArgument(GetProgram()->commandline, CFLAG_CMD)) CallCMDWindow();
+        if (CheckArgument(GetProgram()->commandline, CFLAG_CMD) || editormode) CallCMDWindow();
 #endif
 		// Attach event hooks.
 		ListenEvent(EVENT_PRINT, NULL, Program::EventCallback, Self());
@@ -136,6 +145,7 @@ namespace UltraEngine::Game
         }
 
         // Logging
+        consolelog = CreateBufferStream();
         if (commandline[CFLAG_NOLOG].is_boolean() && commandline[CFLAG_NOLOG])
         {
             log = WriteFile(user_programdata_dir + "/" + title + ".log");
@@ -303,7 +313,7 @@ namespace UltraEngine::Game
         int screenheight = GetSetting(SETTING_SCREENHEIGHT, 768);
         int windowmode = GetSetting(SETTING_WINDOWMODE, 0);
         int displayindex = GetSetting(SETTING_DISPLAY, 0);
-        bool consolemode = CheckArgument(commandline, CFLAG_CONSOLEWINDOW);
+        consolemode = CheckArgument(commandline, CFLAG_CONSOLEWINDOW);
 
         // Load editor settings.
         if (CheckArgument(GetProgram()->commandline, CFLAG_EDITOR))
@@ -375,17 +385,13 @@ namespace UltraEngine::Game
             auto game = mainapp->As<GraphicsWindow>();
             gamecontroller->AttachWindow(game->window);
 
+#ifdef OPTION_USE_CONSOLEWINDOW
             // Create Console Window
             if (consolemode)
             {
                 console = CreateConsoleWindow(game->window);
-#if defined (_WIN32)
-                // Hide the console if CMD is enabled. Show the console it if CMD is hidden.
-                console->SetHidden(CheckArgument(GetProgram()->commandline, CFLAG_CMD));
-#else
-                console->SetHidden(false);
-#endif
             }
+#endif
 
             // Create stage
             stage = CreateStage();
@@ -416,25 +422,18 @@ namespace UltraEngine::Game
 
     void Program::Update()
     {
-        // Terminate the app if called.
-        // TODO: Have this be devmode only??
-        if (gamecontroller->Hit("Terminate")) Terminate(); 
-
-        // Console App
-        if (gamecontroller->Hit("ConsoleApp") && console != NULL)
-        {
-            // Pause the stage. 
-            if (stage) stage->Pause(true);
-
-            // Show the console.
-            console->SetHidden(false);
-        }
-
         if (mainapp != NULL)
         {
             auto game = mainapp->As<GraphicsWindow>();
             if (game != NULL)
             {
+                // Console App
+                if (gamecontroller->Hit("Console") && console != NULL)
+                {
+                    // Show the console.
+                    console->SetHidden(false);
+                }
+
                 if (gamecontroller->Hit("Screenshot"))
                 {
                     TakeScreenshot();
@@ -530,26 +529,54 @@ namespace UltraEngine::Game
         return true;
     }
 
-    void Program::Terminate()
+    void Program::Terminate(const bool force)
     {
         if (stage)
         {
-            auto pausestate = stage->GetPaused();
-            stage->Pause(true);
-
-            auto answer = MessageContinue("Terminate", "Do you wish to terminate this application?");
-            if (answer == MESSAGE_ID_YES)
+            if (!force)
             {
-                EmitEvent(EVENT_QUIT);
+                auto gamecontroller = GetProgram()->GetGameController();
+                String current_set = "";
+                if (gamecontroller)
+                {
+                    current_set = gamecontroller->GetActiveSet();
+                    gamecontroller->SetActiveSet("");
+                }
+
+                auto answer = MessageContinue("Terminate", "Do you wish to terminate this application?");
+                if (answer == MESSAGE_ID_YES)
+                {
+                    EmitEvent(EVENT_QUIT);
+                }
+                else
+                {
+                    if (gamecontroller)
+                    {
+                        gamecontroller->SetActiveSet(current_set);
+                        current_set.clear();
+                    }
+                }
             }
             else
             {
-                stage->Pause(pausestate);
-            }       
+                EmitEvent(EVENT_QUIT);
+            }
+  
         }
         else
         {
-            EmitEvent(EVENT_QUIT);
+            if (!force)
+            {
+                auto answer = MessageContinue("Terminate", "Do you wish to terminate this application?");
+                if (answer == MESSAGE_ID_YES)
+                {
+                    EmitEvent(EVENT_QUIT);
+                }
+            }
+            else
+            {
+                EmitEvent(EVENT_QUIT);
+            }
         }
     }
 
@@ -611,7 +638,10 @@ namespace UltraEngine::Game
 
         // Process Events
         bool ret = false;
-        if (mainapp != NULL) ret = mainapp->ProcessEvent(e);
+        if (mainapp != NULL)
+        {
+            ret = mainapp->ProcessEvent(e);
+        }
         return ret;
     }
 
@@ -656,6 +686,24 @@ namespace UltraEngine::Game
             if (game) game->framebuffer->Capture();
         }
     }
+
+    //void Program::ToggleConsole(/*const bool show*/)
+    //{
+    //    // Console App
+    //    if (gamecontroller->Hit("Console"))
+    //    {
+    //        if (gameconsole.lock() != NULL)
+    //        {
+    //            auto hiddenstate = gameconsole.lock()->GetHidden();
+    //            gameconsole.lock()->SetHidden(!hiddenstate);
+    //        }
+    //        else
+    //        {
+    //            // Show the console window.
+    //            if (console) console->SetHidden(false);
+    //        }
+    //    }
+    //}
 
     void Program::ResizeApp(const int width, const int height, const int style)
     {

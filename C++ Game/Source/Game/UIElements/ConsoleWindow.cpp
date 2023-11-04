@@ -11,15 +11,11 @@
 
 namespace UltraEngine::Game
 {
-	static bool ConsoleWindowEventCallback(const Event& e, shared_ptr<Object> extra)
-	{
-		return extra->As<ConsoleWindow>()->ProcessEvent(e);
-	}
-
 	ConsoleWindow::ConsoleWindow()
 	{
 		historyindex = 0;
 		history.clear();
+		previousactionset.clear();
 	}
 
 	void ConsoleWindow::ManageHistory(const int data)
@@ -81,8 +77,8 @@ namespace UltraEngine::Game
 		}
 
 		Assert(window != NULL);
-		ListenEvent(EVENT_WINDOWCLOSE, window, ConsoleWindowEventCallback, Self());
-		ListenEvent(EVENT_KEYUP, window, ConsoleWindowEventCallback, Self());
+		ListenEvent(EVENT_WINDOWCLOSE, window, EventCallback, Self());
+		ListenEvent(EVENT_KEYUP, window, EventCallback, Self());
 
 		ui = CreateInterface(window);
 		ui->LoadColorScheme(GetProgram()->GetGUITheme());
@@ -91,8 +87,8 @@ namespace UltraEngine::Game
 		auto ui_size = ui->root->GetSize();
 		textarea_log = CreateTextArea(8, 8, ui_size.x - 16, ui_size.y - 8 - 50, ui->root, TEXTAREA_SCROLLDOWN);
 		textarea_log->SetLayout(1, 1, 1, 1);
-		textarea_log->AddText(GetProgram()->author + " - Console (" + String(__DATE__) + ")\n");
-		ListenEvent(EVENT_PRINT, NULL, ConsoleWindowEventCallback, Self());
+		
+		ListenEvent(EVENT_PRINT, NULL, EventCallback, Self());
 
 		panel_entry = CreatePanel(8, textarea_log->GetPosition().y + textarea_log->GetSize().y + 8, textarea_log->GetSize().x, 32, ui->root);
 		panel_entry->SetLayout(1, 1, 0, 1);
@@ -101,24 +97,45 @@ namespace UltraEngine::Game
 		textfield_entry = CreateTextField(0, 0, panel_entry->GetSize().x - 72 - 16, 32, panel_entry);
 		textfield_entry->SetLayout(1, 1, 0, 1);
 		textfield_entry->Activate();
-		ListenEvent(EVENT_WIDGETACTION, textfield_entry, ConsoleWindowEventCallback, Self());
+		ListenEvent(EVENT_WIDGETACTION, textfield_entry, EventCallback, Self());
+
+		// Write what's already in the console log buffer.
+		auto log = GetProgram()->consolelog;
+		if (log)
+		{
+			textarea_log->AddText(GetProgram()->author + " - Console (" + String(__DATE__) + ")\n");
+			while (!log->Eof())
+			{
+				textarea_log->AddText(log->ReadWLine());
+			}
+		}
 	}
 
 	void ConsoleWindow::SetHidden(const bool hide)
 	{
 		if (window != NULL)
 		{
+			auto gamecontroller = GetProgram()->GetGameController();
+
 			window->SetHidden(hide);
 			if (!hide)
 			{
+				if (gamecontroller)
+				{
+					previousactionset = gamecontroller->GetActiveSet();
+					gamecontroller->SetActiveSet("");
+				}
+				
 				window->Activate();
 				textfield_entry->Activate();
 			}
 			else
 			{
+				if (gamecontroller && !previousactionset.empty()) gamecontroller->SetActiveSet(previousactionset);
 				if (parentwindow.lock() != NULL)
 				{
 					parentwindow.lock()->Activate();
+					previousactionset.clear();
 				}
 			}
 		}
@@ -136,6 +153,13 @@ namespace UltraEngine::Game
 		//	ManageHistory(e.data);
 		//}
 		else if (e.id == EVENT_WINDOWCLOSE)
+		{
+			if (e.source == window)
+			{
+				SetHidden(true);
+			}
+		}
+		else if (e.id == EVENT_WIDGETSELECT)
 		{
 			if (e.source == window)
 			{

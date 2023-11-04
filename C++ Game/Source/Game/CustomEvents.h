@@ -11,6 +11,7 @@
 
 namespace UltraEngine
 {
+	// Application
 	const EventId EVENT_PROGRAMSTART = EventId(11001); // Used when the correct applet is into memory.
 	const EventId EVENT_GRAPHICSWINDOW = EventId(11002); // Emitted when a graphics window is created. Useful when rescaling the UI.
 	const EventId EVENT_CONSOLEEXECUTE = EventId(11003); // Emitted when a console command is executed.
@@ -26,4 +27,8 @@ namespace UltraEngine
 
 	// Sound
 	const EventId EVENT_GAMESPEAKER = EventId(11009); // Emitted when a GameSpeaker emits a sound.
+
+	// UI
+	const EventId EVENT_MENU = EventId(11010); // Emitted when a menu element changes state.
+	const EventId EVENT_HIGHLIGHT = EventId(11011); // Emitted when the highlight changes state
 }

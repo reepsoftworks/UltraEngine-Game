@@ -17,11 +17,12 @@ namespace UltraEngine::Game
 		shared_ptr<UltraEngine::Window> window;
 		std::weak_ptr<UltraEngine::Window> parentwindow;
 		shared_ptr<Interface> ui;
+		String previousactionset;
 
-		std::shared_ptr<UltraEngine::Widget> textarea_log;
-		std::shared_ptr<UltraEngine::Widget> panel_entry;
-		std::shared_ptr<UltraEngine::Widget> textfield_entry;
-		std::shared_ptr<UltraEngine::Widget> button_send;
+		shared_ptr<Widget> textarea_log;
+		shared_ptr<Widget> panel_entry;
+		shared_ptr<Widget> textfield_entry;
+		shared_ptr<Widget> button_send;
 
 		std::size_t historyindex;
 		std::vector<UltraEngine::WString> history;
@@ -33,6 +34,8 @@ namespace UltraEngine::Game
 		virtual void SetHidden(const bool hide);
 		virtual bool ProcessEvent(const Event& e);
 		static shared_ptr<ConsoleWindow> Create(shared_ptr<UltraEngine::Window> parent);
+
+		friend class Program;
 	};
 
 	extern shared_ptr<ConsoleWindow> CreateConsoleWindow(shared_ptr<UltraEngine::Window> parent = NULL);

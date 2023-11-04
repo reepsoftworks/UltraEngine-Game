@@ -1,0 +1,140 @@
+{
+	"scene": {
+		"ambientlight": [
+			0.0,
+			0.0,
+			0.0
+		],
+		"base": "",
+		"diffusereflection": {
+			"path": "Materials/Environment/Default/diffuse.dds"
+		},
+		"entities": [
+			{
+				"camera": {
+					"clearcolor": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"clearmode": 3,
+					"fov": 90.0,
+					"range": [
+						0.10000000149011612,
+						1000.0
+					]
+				},
+				"castshadows": false,
+				"collisiontype": 0,
+				"components": {
+					"SettingsListener": {}
+				},
+				"friction": [
+					0.5,
+					0.8999999761581421
+				],
+				"matrix": [
+					"0x3f800000",
+					"0x0",
+					"0x0",
+					"0x0",
+					"0x0",
+					"0x3f800000",
+					"0x0",
+					"0x0",
+					"0x0",
+					"0x0",
+					"0x3f800000",
+					"0x0",
+					"0x0",
+					"0x30f5c28e",
+					"0x0",
+					"0x3f800000"
+				],
+				"name": "Camera",
+				"physicsmode": 0,
+				"pickmode": 0,
+				"position": [
+					"0x0",
+					"0x30f5c28e",
+					"0x0"
+				],
+				"reflection": true,
+				"uuid": "77953445-aa3b-4262-86df-35625aef1f39"
+			}
+		],
+		"extras": {
+			"viewports": [
+				{
+					"cameraposition": [
+						0,
+						2.86788,
+						-4.09576
+					],
+					"camerarotation": [
+						35,
+						0,
+						0
+					],
+					"gridsize": 0,
+					"view": 0,
+					"zoom": 1.42815
+				},
+				{
+					"cameraposition": [
+						0,
+						0,
+						0
+					],
+					"camerarotation": [
+						90,
+						0,
+						0
+					],
+					"gridsize": 0,
+					"view": 3,
+					"zoom": 100
+				},
+				{
+					"cameraposition": [
+						0,
+						0,
+						0
+					],
+					"camerarotation": [
+						0,
+						0,
+						0
+					],
+					"gridsize": 0,
+					"view": 5,
+					"zoom": 100
+				},
+				{
+					"cameraposition": [
+						0,
+						0,
+						0
+					],
+					"camerarotation": [
+						0,
+						90,
+						0
+					],
+					"gridsize": 0,
+					"view": 1,
+					"zoom": 100
+				}
+			]
+		},
+		"gravity": [
+			0.0,
+			-20.0,
+			0.0
+		],
+		"iblintensity": 1.0,
+		"specularreflection": {
+			"path": "Materials/Environment/Default/specular.dds"
+		}
+	}
+}

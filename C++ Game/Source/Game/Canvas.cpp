@@ -37,7 +37,8 @@ namespace UltraEngine::Game
 
 	void Canvas::Reposition(const iVec2& framebuffersize)
 	{
-		camera->SetPosition(float(framebuffersize.x) * 0.5f, float(framebuffersize.y) * 0.5f);
+		size = framebuffersize;
+		camera->SetPosition(float(size.x) * 0.5f, float(size.y) * 0.5f, depth);
 	}
 
 	unsigned int Canvas::GetRenderLayers()
@@ -45,8 +46,18 @@ namespace UltraEngine::Game
 		return camera->GetRenderLayers();
 	}
 
+	iVec2 Canvas::GetSize()
+	{
+		return size;
+	}
+
+	shared_ptr<Camera> Canvas::GetCamera()
+	{
+		return camera;
+	}
+
 	std::map<int, std::weak_ptr<Canvas>> canvases;
-	shared_ptr<Canvas> GetCanvas(shared_ptr<World> world, const int renderlayer)
+	shared_ptr<Canvas> GetCanvas(shared_ptr<World> world, const int renderlayer, const float depth)
 	{
 		auto canvas = canvases[renderlayer].lock();
 		if (canvas == NULL)
@@ -57,7 +68,9 @@ namespace UltraEngine::Game
 			canvas->camera = CreateCamera(world, PROJECTION_ORTHOGRAPHIC);
 			canvas->camera->SetRenderLayers(renderlayer);
 			canvas->camera->SetClearMode(CLEAR_DEPTH);
-			canvas->camera->SetPosition(float(sz.x) * 0.5f, float(sz.y) * 0.5f);
+			canvas->camera->SetPosition(float(sz.x) * 0.5f, float(sz.y) * 0.5f, depth);
+			canvas->size = sz;
+			canvas->depth = depth;
 		}
 
 		return canvas;

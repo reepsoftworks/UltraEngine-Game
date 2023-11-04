@@ -34,9 +34,8 @@ namespace UltraEngine::Game
 
 	bool LoadingScreen::ProcessEvent(const Event& e)
 	{
-		switch (e.id)
+		if (e.id == EVENT_GRAPHICSWINDOW)
 		{
-		case EVENT_GRAPHICSWINDOW:
 			if (ui != NULL)
 			{
 				// Base
@@ -46,11 +45,6 @@ namespace UltraEngine::Game
 				ResizeClearScreen(e.size);
 				ResizeLoadScreen(e.size);
 			}
-			break;
-
-		//case EVENT_WINDOWDPICHANGED:
-		//	ui->SetScale(float(e.data) / 100.0f);
-		//	break;
 		}
 		return true;
 	}
@@ -235,6 +229,10 @@ namespace UltraEngine::Game
 
 		// Build loading screen.
 		BuildLoadScreen();
+
+		// Create the in-game console.
+		//console = CreatePivot(GetProgram()->GetStage()->MenuWorld());
+		//console->AddComponent<InGameConsole>();
 	}
 
 	void LoadingScreen::ShowClearScreen()
@@ -259,6 +257,12 @@ namespace UltraEngine::Game
 			{
 				loadingpanel->SetPixmap(loadingimage[final_index], PIXMAP_FIT);
 			}
+
+			//if (console)
+			//{
+			//	auto component = console->GetComponent<InGameConsole>();
+			//	if (component) component->SetHidden(true);
+			//}
 
 			logo->SetHidden(true);
 			loadingpanel->SetHidden(false);

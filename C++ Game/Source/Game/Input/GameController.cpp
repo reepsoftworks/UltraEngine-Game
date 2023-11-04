@@ -264,13 +264,46 @@ namespace UltraEngine::Game
 		return data;
 	}
 
-	void GameController::SetActiveSet(const String& setname)
+	void GameController::SetActiveSet(const String& setname, const bool centermouse)
 	{
 		if (setname != activeset)
 		{
 			input->Flush();
+
+			if (!setname.empty())
+			{
+				if (config[setname]["mousecursor"].is_integer())
+				{
+					int m = config[setname]["mousecursor"];
+					currentcursor = (MouseCursor)m;
+					input->GetWindow()->SetCursor(currentcursor);
+				}
+				else
+				{
+					// If none exist, resort to default.
+					currentcursor = CURSOR_DEFAULT;
+					input->GetWindow()->SetCursor(currentcursor);
+				}
+			}
+			else
+			{
+				// If the set is global (blank) use the default cursor.
+				currentcursor = CURSOR_DEFAULT;
+				input->GetWindow()->SetCursor(currentcursor);
+			}
+
+			if (centermouse)
+			{
+				CenterCursor();
+			}
+
 			activeset = setname;
 		}
+	}
+
+	const String GameController::GetActiveSet()
+	{
+		return activeset;
 	}
 
 	bool GameController::Hit(const String& actionname)
@@ -512,6 +545,14 @@ namespace UltraEngine::Game
 		return Vec2((float)v.x, (float)v.y);
 	}
 
+
+	void GameController::SetActionSetCursor(const String& setname, MouseCursor cursor)
+	{
+		if (!setname.empty())
+		{
+			config[setname]["mousecursor"] = cursor;
+		}
+	}
 
 	void GameController::SetSetting(const String& setting, const int value)
 	{

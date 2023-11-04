@@ -13,7 +13,7 @@ namespace UltraEngine::Game
 {
     bool UIElement::EventCallback(const Event& e, shared_ptr<Object> extra)
     {
-        return true;
+        return extra->As<UIElement>()->ProcessEvent(e);
     }
 
     bool UIElement::ProcessEvent(const Event& e)
@@ -23,6 +23,7 @@ namespace UltraEngine::Game
 
     void UIElement::Listen(const EventId eventid, shared_ptr<Object> widget)
     {
-        ListenEvent(eventid, widget, EventCallback);
+        if (Self() == NULL) return;
+        ListenEvent(eventid, widget, EventCallback, Self());
     }
 }

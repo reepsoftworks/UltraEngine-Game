@@ -22,6 +22,8 @@ namespace UltraEngine::Game
 		shared_ptr<Widget> loadinglabel;
 		std::vector<shared_ptr<Pixmap>> loadingimage;
 
+		//shared_ptr<Pivot> console;
+
 		static bool EventCallback(const Event& e, shared_ptr<Object> extra);
 
 	protected:

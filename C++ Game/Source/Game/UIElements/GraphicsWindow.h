@@ -38,6 +38,8 @@ namespace UltraEngine::Game
         void Resize(shared_ptr<Display> display, const int width, const int height, const GraphicWindowStyles style);
         void Render(shared_ptr<World> world);
         const iVec2 GetFramebufferSize();
+
+        friend shared_ptr<GraphicsWindow> CreateGraphicsWindow(const WString& title, const int width, const int height, shared_ptr<Display> display, const GraphicWindowStyles style);
     };
 
     extern shared_ptr<GraphicsWindow> CreateGraphicsWindow(const WString& title, const int width, const int height, shared_ptr<Display> display, const GraphicWindowStyles style = GRAPHICSWINDOW_TITLEBAR);

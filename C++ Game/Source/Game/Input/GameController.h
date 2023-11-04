@@ -52,7 +52,8 @@ namespace UltraEngine::Game
 		virtual void SetAction(const String& actionname, InputAction action, const String& setname = "");
 		InputAction GetActionData(const String& actionname, const String& setname = "");
 
-		virtual void SetActiveSet(const String& setname);
+		virtual void SetActiveSet(const String& setname, const bool centermouse = false);
+		const String GetActiveSet();
 		virtual bool Hit(const String& actionname);
 		virtual bool Down(const String& actionname);
 		virtual bool Released(const String& actionname);
@@ -68,6 +69,8 @@ namespace UltraEngine::Game
 		void SetCursorHidden(const bool hide);
 		iVec2 GetCursorPosition();
 		Vec2 GetCursorFloatPosition();
+
+		virtual void SetActionSetCursor(const String& setname, MouseCursor cursor = CURSOR_DEFAULT);
 
 		virtual void SetSetting(const String& setting, const int value);
 		virtual void SetSetting(const String& setting, const float value);

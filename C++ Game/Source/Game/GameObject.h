@@ -11,6 +11,8 @@
 
 namespace UltraEngine::Game
 {
+	// Deprecated
+#if 0
 	class Stage;
 	class GameController;
 
@@ -44,4 +46,5 @@ namespace UltraEngine::Game
 
 		friend class Stage;
 	};
+#endif
 }

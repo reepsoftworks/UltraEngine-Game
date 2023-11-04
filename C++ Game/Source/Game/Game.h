@@ -74,6 +74,7 @@ using namespace UltraEngine;
 #define COMMAND_SAVE "save"
 #define COMMAND_RESTART "restart"
 #define COMMAND_QUIT "quit"
+#define COMMAND_SHOWDEBUG "d_show"
 #define COMMAND_SHOWPHYSICS "d_physics"
 #define COMMAND_WIREFRAME "d_wireframe"
 
@@ -93,11 +94,16 @@ using namespace UltraEngine;
 #define ASSETFALLBACK_SOUND "Sound/error.wav"
 
 //Render Layers
-#define RENDERLAYER_GLOWENTITY 1+2
-#define RENDERLAYER_GLOWCAMERA 2
-#define RENDERLAYER_GLOWSPRITE 4
-#define RENDERLAYER_HUD 8
-#define RENDERLAYER_MENU 16
+#define RENDERLAYER_NULL 0
+#define RENDERLAYER_DEFAULT 1
+#define RENDERLAYER_HIGHLIGHT 2
+#define RENDERLAYER_HIGHLIGHT2D 4
+#define RENDERLAYER_DEBUG 8
+#define RENDERLAYER_VIEWMODEL 16
+#define RENDERLAYER_HUD 1
+
+//Options
+#define OPTION_USE_CONSOLEWINDOW 1
 
 #ifdef DEBUG
 #define IsDebug() true
@@ -105,6 +111,7 @@ using namespace UltraEngine;
 #define IsDebug() false
 #endif
 
+class InGameConsole;
 namespace UltraEngine::Game
 {
 	class SplashScreen;
@@ -123,6 +130,7 @@ namespace UltraEngine::Game
 	public:
 		table config;
 		shared_ptr<Stream> log;
+		shared_ptr<BufferStream> consolelog;
 		table commandline;
 		WString title;
 		WString author;
@@ -141,6 +149,7 @@ namespace UltraEngine::Game
 		shared_ptr<ConsoleWindow> console;
 		bool luaapp;
 		bool pausewhenunselected;
+		bool consolemode;
 
 		Program();
 
@@ -158,7 +167,7 @@ namespace UltraEngine::Game
 		void Update();
 
 		bool Shutdown();
-		void Terminate();
+		void Terminate(const bool force = true);
 		bool ProcessEvent(const Event& e);
 		static bool EventCallback(const Event& e, shared_ptr<Object> extra);
 		bool Initialized;

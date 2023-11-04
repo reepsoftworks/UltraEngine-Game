@@ -38,7 +38,7 @@ namespace UltraEngine::Game
 		WString mappath;
 		bool pausestate;
 		shared_ptr<Timer> startmaptimer;
-		
+
 	public:
 		int frequency;
 		int threads;

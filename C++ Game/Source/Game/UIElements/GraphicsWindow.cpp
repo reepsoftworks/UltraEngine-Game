@@ -63,9 +63,24 @@ namespace UltraEngine::Game
 			break;
 		}
 
-		windowtitle = title;
 		this->style = style;
-		if (IsDebug()) windowtitle = windowtitle + " - [Debug]";
+		if (IsDebug())
+		{
+			WString debugtag = " - [Debug]"; // 10;
+			if (title.Right((int)debugtag.length()) != debugtag)
+			{
+				windowtitle = title + debugtag;
+			}
+			else
+			{
+				windowtitle = title;
+			}
+		}
+		else
+		{
+			windowtitle = title;
+		}
+			
 		window = CreateWindow(windowtitle, 0, 0, w, h, display, window_style);
 
 		const TitlebarTheme themesetting = (TitlebarTheme)GetProgram()->GetSetting(SETTING_WINDOWTHEME, (int)TITLEBAR_SYSTEM);
@@ -178,6 +193,7 @@ namespace UltraEngine::Game
 	{
 		auto app = std::make_shared<GraphicsWindow>();
 		app->Initialize(title, width, height, display, style);
+		//app->Listen(EVENT_NONE, NULL); 	// << Listen to all events!
 		return app;
 	}
 }

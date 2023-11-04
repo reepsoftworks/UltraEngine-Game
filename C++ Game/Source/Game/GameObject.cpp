@@ -11,6 +11,8 @@
 
 namespace UltraEngine::Game
 {
+	// Deprecated
+#if 0
 	GameObject::GameObject()
 	{
 	}
@@ -129,4 +131,5 @@ namespace UltraEngine::Game
 			}
 		}
 	}
+#endif
 }

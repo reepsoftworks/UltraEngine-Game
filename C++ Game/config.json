@@ -7,7 +7,7 @@
     "pluginsPath": "Plugins",
     "addonsPath": "Addons",
     "colorSchemesPath": "UI/Color Schemes",
-    "startMap": "",
+    "startMap": "Maps/blank.ultra",
     "defaultSettings":
     {
         "darkColorScheme": "dark.json",
