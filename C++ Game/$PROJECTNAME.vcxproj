@@ -81,6 +81,7 @@
       <AdditionalDependencies>UltraEngine_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ProgramDatabaseFile>.vs\$(Configuration)\$(TargetName).pdb</ProgramDatabaseFile>
       <ImportLibrary>.vs\$(Configuration)\$(TargetName).lib</ImportLibrary>
+      <AdditionalOptions>/delayload:openvr_api.dll %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PreBuildEvent>
       <Command>$(SolutionDir)\Tools\Preprocessor.exe +path "../"</Command>
@@ -111,7 +112,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalOptions>/OPT:NOICF,NOLBR %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/OPT:NOICF,NOLBR /delayload:openvr_api.dll %(AdditionalOptions)</AdditionalOptions>
       <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
       <AdditionalLibraryDirectories>$(UltraEnginePath)\Library;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -134,7 +135,6 @@
     <ClCompile Include="Source\Game\CustomWidgets\Spinner.cpp" />
     <ClCompile Include="Source\Game\Game.cpp" />
     <ClCompile Include="Source\Game\GameLuaBindings.cpp" />
-    <ClCompile Include="Source\Game\GameObject.cpp" />
     <ClCompile Include="Source\Game\Input\ButtonCode.cpp" />
     <ClCompile Include="Source\Game\Input\GameController.cpp" />
     <ClCompile Include="Source\Game\Input\Input.cpp" />
@@ -172,7 +172,6 @@
     <ClInclude Include="Source\Game\CustomWidgets\Spinner.h" />
     <ClInclude Include="Source\Game\Game.h" />
     <ClInclude Include="Source\Game\GameLuaBindings.h" />
-    <ClInclude Include="Source\Game\GameObject.h" />
     <ClInclude Include="Source\Game\Input\ButtonCode.h" />
     <ClInclude Include="Source\Game\Input\GameController.h" />
     <ClInclude Include="Source\Game\Input\Input.h" />
@@ -192,7 +191,7 @@
     <ClInclude Include="Source\Game\Utilities\StringFunctions.h" />
     <ClInclude Include="Source\Game\Utilities\SystemTime.h" />
     <ClInclude Include="Source\Game\Utilities\Win32System.h" />
-    <ClInclude Include="Source\RegisterComponents.h" />
+    <ClInclude Include="Source\ComponentSystem.h" />
     <ClInclude Include="Source\resource.h" />
     <ClInclude Include="Source\targetver.h" />
   </ItemGroup>

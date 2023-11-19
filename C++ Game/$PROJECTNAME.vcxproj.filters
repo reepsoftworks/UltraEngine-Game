@@ -137,9 +137,6 @@
     <ClCompile Include="Source\Game\GameLuaBindings.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Game\GameObject.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Game\LoadingScreen.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
@@ -226,7 +223,7 @@
     <ClInclude Include="Source\Game\Utilities\SystemTime.h">
       <Filter>Header Files\Game\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="Source\RegisterComponents.h">
+    <ClInclude Include="Source\ComponentSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\UIElement.h">
@@ -242,9 +239,6 @@
       <Filter>Header Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\GameLuaBindings.h">
-      <Filter>Header Files\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Game\GameObject.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\LoadingScreen.h">

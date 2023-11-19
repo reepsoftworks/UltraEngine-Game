@@ -46,7 +46,6 @@ using namespace UltraEngine;
 //Game
 #include "Stage.h"
 #include "GameLuaBindings.h"
-#include "GameObject.h"
 #include "LoadingScreen.h"
 #include "Canvas.h"
 
@@ -66,6 +65,8 @@ using namespace UltraEngine;
 #define CFLAG_NOLOG "nolog"
 #define CFLAG_NOSPLASH "nosplash"
 #define CFLAG_SETTINGSAPP "settings"
+#define CFLAG_VR "vr"
+#define CFLAG_NOVR "novr"
 
 //Commands
 #define COMMAND_MAP "map"
@@ -127,6 +128,8 @@ namespace UltraEngine::Game
 
 	class Program : public Object
 	{
+		bool vrenabled;
+		bool InitializeEngineSettings();
 	public:
 		table config;
 		shared_ptr<Stream> log;
@@ -177,6 +180,7 @@ namespace UltraEngine::Game
 		void Render(shared_ptr<World> world);
 		void TakeScreenshot();
 		void ResizeApp(const int width, const int height, const int style);
+		bool VREnabled();
 
 		WString GetGUITheme();
 		shared_ptr<GameController> GetGameController();

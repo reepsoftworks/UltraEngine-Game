@@ -1,5 +1,5 @@
 #include "UltraEngine.h"
-#include "RegisterComponents.h"
+#include "ComponentSystem.h"
 #include "Game/Game.h"
 using namespace UltraEngine;
 using namespace UltraEngine::Game;

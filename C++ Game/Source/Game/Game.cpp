@@ -96,6 +96,7 @@ namespace UltraEngine::Game
         luaapp = false;
         pausewhenunselected = false;
         consolemode = false;
+        vrenabled = false;
 
         Initialized = false;
 	}
@@ -106,7 +107,6 @@ namespace UltraEngine::Game
             return true;
 
         const bool editormode = CheckArgument(GetProgram()->commandline, CFLAG_EDITOR);
-
 
         // Start CMD window if flag is set and if we're on Windows.
 #if defined (_WIN32)
@@ -173,8 +173,93 @@ namespace UltraEngine::Game
             }
         }
 
-        return Initialized;
+        const bool engineinit = InitializeEngineSettings();
+        return Initialized && engineinit;
 	}
+
+    bool Program::InitializeEngineSettings()
+    {
+        Assert(!config.empty(), "Failed to load config.json!");
+
+        // This is an interesting idea with terrible consiquences..
+        // Allow the engine settings to be changed with the config file.
+        // We're not going to save anything. This is so people who know what they 
+        // are doing to have better access to the engine easier.
+        // If you're one of these people... Hi! :)
+        EngineSettings settings;
+
+        if (!config["engine"].is_null())
+        {
+            auto i = config["engine"]["maxskeletons"];
+            if (!i.is_null()) settings.maxskeletons = i;
+
+            i = config["engine"]["maxcubemaps"];
+            if (!i.is_null()) settings.maxcubemaps = i;
+
+            i = config["engine"]["maxshadowmaps"];
+            if (!i.is_null()) settings.maxshadowmaps = i;
+
+            i = config["engine"]["maxtextures2d"];
+            if (!i.is_null()) settings.maxtextures2d = i;
+
+            i = config["engine"]["maxindices"];
+            if (!i.is_null()) settings.maxindices = i;
+
+            i = config["engine"]["maxvertices"];
+            if (!i.is_null()) settings.maxvertices = i;
+
+            i = config["engine"]["maxmaterials"];
+            if (!i.is_null()) settings.maxmaterials = i;
+
+            i = config["engine"]["usediscretegpu"];
+            if (!i.is_null()) settings.usediscretegpu = i;
+
+            // For VR, just look for vr as OpenVR might become OpenXR someday.
+            i = config["engine"]["vr"];
+            if (!i.is_null())
+            {
+                // Tell me we're a VR app!
+                vrenabled = i;
+
+                settings.openvr = vrenabled;
+                //settings.openxr = vrenabled;
+            }
+        }
+
+        // Ok, if VR isn't in the config, still allow VR to be toggled on for
+        // hybrid applications.
+        if (!vrenabled)
+        {
+            const bool forcevr = CheckArgument(commandline, CFLAG_VR);
+            if (forcevr)
+            {
+                // Enable VR
+                vrenabled = true;
+
+                settings.openvr = vrenabled;
+                //settings.openxr = vrenabled;   
+            }
+        }
+        else
+        {
+            const bool disablevr = CheckArgument(commandline, CFLAG_NOVR);
+            if (disablevr)
+            {
+                // Disable VR
+                vrenabled = false;
+
+                settings.openvr = vrenabled;
+                //settings.openxr = vrenabled;   
+            }
+        }
+
+        // Tell the engine to Initialize the settings.
+        if (!UltraEngine::Initialize(settings)) return false;
+
+        if (vrenabled) Print("Virtual Reality: Enabled!");
+
+        return true;
+    }
 
     bool Program::LoadPlugins()
     {
@@ -708,6 +793,11 @@ namespace UltraEngine::Game
     void Program::ResizeApp(const int width, const int height, const int style)
     {
         EmitEvent(EVENT_WINDOWSIZE, Self(), style, 0, 0, width, height, maindisplay);
+    }
+
+    bool Program::VREnabled()
+    {
+        return vrenabled;
     }
 
     WString Program::GetGUITheme()
