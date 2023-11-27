@@ -8,16 +8,22 @@
 //=====================================================================//
 #pragma once
 #include "UltraEngine.h"
+#include "../Game.h"
 
 namespace UltraEngine::Game
 {
-    class Program;
-    class UIElement : public UltraEngine::Panel
+    class UIWindow;
+    class UIPanel : public UIElement
     {
-    protected:
-        friend Program;
-        static bool EventCallback(const Event& e, shared_ptr<Object> extra);
-        virtual bool ProcessEvent(const Event& e);
-        virtual void Listen(const EventId eventid = EVENT_NONE, shared_ptr<Object> widget = NULL);
+        virtual void OnActivate() {};
+    public:
+        shared_ptr<Widget> root;
+
+        UIPanel();
+        ~UIPanel();
+
+        virtual void BuildWidgets(const iVec2& size, const shared_ptr<Widget> parent) {};
+
+        friend UIWindow;
     };
 }

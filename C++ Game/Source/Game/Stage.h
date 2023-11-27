@@ -14,10 +14,18 @@ namespace UltraEngine::Game
 {
 	class Program;
 	class LoadingScreen;
+	class GameObject;
 }
 
 namespace UltraEngine::Game
 {
+	enum StageHmd
+	{
+		STAGEHMD_ACTIVE = -1,
+		STAGEHMD_MENU,
+		STAGEHMD_GAME
+	};
+
 	class Stage : public Object
 	{
 		// Current world pointer.
@@ -38,6 +46,9 @@ namespace UltraEngine::Game
 		WString mappath;
 		bool pausestate;
 		shared_ptr<Timer> startmaptimer;
+
+		// VR
+		std::array<shared_ptr<Hmd>, 2> hmd;
 
 	public:
 		int frequency;
@@ -84,6 +95,8 @@ namespace UltraEngine::Game
 			loadingscreen = c;
 			return c;
 		}
+
+		shared_ptr<Hmd> GetHmd(const StageHmd stagehmd = STAGEHMD_ACTIVE);
 
 		friend class GamePlayer;
 		friend UltraEngine::Game::Program;

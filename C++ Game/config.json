@@ -3,6 +3,7 @@
     "appAuthor": "Your Company Here",
     "appVersion": "1.0.0",
     "appID": 480,
+    "isVR" : false,
     "scriptsPath": "Scripts",
     "pluginsPath": "Plugins",
     "addonsPath": "Addons",

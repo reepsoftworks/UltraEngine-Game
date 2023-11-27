@@ -9,6 +9,9 @@
 #include "UltraEngine.h"
 #include "Game.h"
 
+#include "UIElements/ConsoleUI.h"
+#include "UIElements/SettingsUI.h"
+
 namespace UltraEngine::Game
 {
     // This member is used by the game controller and the graphics window to fix a terrible bug
@@ -213,17 +216,14 @@ namespace UltraEngine::Game
 
             i = config["engine"]["usediscretegpu"];
             if (!i.is_null()) settings.usediscretegpu = i;
+        }
 
-            // For VR, just look for vr as OpenVR might become OpenXR someday.
-            i = config["engine"]["vr"];
-            if (!i.is_null())
-            {
-                // Tell me we're a VR app!
-                vrenabled = i;
-
-                settings.openvr = vrenabled;
-                //settings.openxr = vrenabled;
-            }
+#ifdef OPTION_USE_VR
+        // Init VR
+        if (!config["isVR"].is_null() && config["isVR"].is_boolean())
+        {
+            // Tell me we're a VR app!
+            vrenabled = config["isVR"];
         }
 
         // Ok, if VR isn't in the config, still allow VR to be toggled on for
@@ -235,9 +235,6 @@ namespace UltraEngine::Game
             {
                 // Enable VR
                 vrenabled = true;
-
-                settings.openvr = vrenabled;
-                //settings.openxr = vrenabled;   
             }
         }
         else
@@ -246,10 +243,7 @@ namespace UltraEngine::Game
             if (disablevr)
             {
                 // Disable VR
-                vrenabled = false;
-
-                settings.openvr = vrenabled;
-                //settings.openxr = vrenabled;   
+                vrenabled = false; 
             }
         }
 
@@ -257,7 +251,7 @@ namespace UltraEngine::Game
         if (!UltraEngine::Initialize(settings)) return false;
 
         if (vrenabled) Print("Virtual Reality: Enabled!");
-
+#endif
         return true;
     }
 
@@ -474,7 +468,10 @@ namespace UltraEngine::Game
             // Create Console Window
             if (consolemode)
             {
-                console = CreateConsoleWindow(game->window);
+                console = std::make_shared<UIWindow>();
+                console->BuildWindow("Console", 800, 600, game->window);
+                console->SetUIPanel<ConsoleUI>();
+                console->callaction = "Console";
             }
 #endif
 
@@ -484,8 +481,13 @@ namespace UltraEngine::Game
         }
         else if (programtype == PROGRAMAPP_SETTINGS)
         {
-            mainapp = CreateSettingWindow();
-             
+            mainapp = std::make_shared<UIWindow>();
+            auto cast = mainapp->As<UIWindow>();
+            if (cast)
+            {
+                cast->BuildWindow("Settings", 800, 600);
+                cast->SetUIPanel<SettingsUI>();
+            }
         }
         else if (programtype == PROGRAMAPP_LUASCRIPT)
         {
@@ -512,13 +514,6 @@ namespace UltraEngine::Game
             auto game = mainapp->As<GraphicsWindow>();
             if (game != NULL)
             {
-                // Console App
-                if (gamecontroller->Hit("Console") && console != NULL)
-                {
-                    // Show the console.
-                    console->SetHidden(false);
-                }
-
                 if (gamecontroller->Hit("Screenshot"))
                 {
                     TakeScreenshot();
@@ -771,24 +766,6 @@ namespace UltraEngine::Game
             if (game) game->framebuffer->Capture();
         }
     }
-
-    //void Program::ToggleConsole(/*const bool show*/)
-    //{
-    //    // Console App
-    //    if (gamecontroller->Hit("Console"))
-    //    {
-    //        if (gameconsole.lock() != NULL)
-    //        {
-    //            auto hiddenstate = gameconsole.lock()->GetHidden();
-    //            gameconsole.lock()->SetHidden(!hiddenstate);
-    //        }
-    //        else
-    //        {
-    //            // Show the console window.
-    //            if (console) console->SetHidden(false);
-    //        }
-    //    }
-    //}
 
     void Program::ResizeApp(const int width, const int height, const int style)
     {

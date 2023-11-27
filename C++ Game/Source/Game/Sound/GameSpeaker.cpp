@@ -325,14 +325,22 @@ namespace UltraEngine::Game
 	shared_ptr<GameSpeaker> CreateGameSpeaker(const WString& path, const xVec3& position)
 	{
 		auto gamespeaker = std::make_shared<GameSpeaker>();
-		gamespeaker->profile = LoadSoundProfile(path);
-		if (!gamespeaker->profile)
+
+		if (!path.empty())
 		{
-			gamespeaker = NULL;
-			return NULL;
+			gamespeaker->profile = LoadSoundProfile(path);
+			if (!gamespeaker->profile)
+			{
+				gamespeaker = NULL;
+				return NULL;
+			}
+			gamespeaker->speaker = LoadSpeaker(gamespeaker->profile);
+		}
+		else
+		{
+			gamespeaker->speaker = CreateSpeaker(NULL);
 		}
 
-		gamespeaker->speaker = LoadSpeaker(gamespeaker->profile);
 		gamespeaker->position = position;
 		gamespeaker->speaker->SetPosition(gamespeaker->position);
 		ListenEvent(EVENT_PAUSESTATE, GetProgram(), GameSpeakerEventCallback, gamespeaker);

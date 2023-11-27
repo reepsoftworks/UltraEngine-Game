@@ -46,6 +46,7 @@ using namespace UltraEngine;
 //Game
 #include "Stage.h"
 #include "GameLuaBindings.h"
+#include "GameObject.h"
 #include "LoadingScreen.h"
 #include "Canvas.h"
 
@@ -53,8 +54,8 @@ using namespace UltraEngine;
 #include "UIElement.h"
 #include "UIElements/SplashScreen.h"
 #include "UIElements/GraphicsWindow.h"
-#include "UIElements/SettingsWindow.h"
-#include "UIElements/ConsoleWindow.h"
+#include "UIElements/UIPanel.h"
+#include "UIElements/UIWindow.h"
 
 //CFLAGS
 #define CFLAG_CMD "cmd"
@@ -105,6 +106,7 @@ using namespace UltraEngine;
 
 //Options
 #define OPTION_USE_CONSOLEWINDOW 1
+#define OPTION_USE_VR 1
 
 #ifdef DEBUG
 #define IsDebug() true
@@ -117,7 +119,7 @@ namespace UltraEngine::Game
 {
 	class SplashScreen;
 	class GraphicsWindow;
-	class ConsoleWindow;
+	class UIWindow;
 
 	enum ProgramApp
 	{
@@ -149,7 +151,8 @@ namespace UltraEngine::Game
 		shared_ptr<Display> maindisplay;
 		shared_ptr<UIElement> mainapp;
 		shared_ptr<Stage> stage;
-		shared_ptr<ConsoleWindow> console;
+		shared_ptr<UIWindow> console;
+
 		bool luaapp;
 		bool pausewhenunselected;
 		bool consolemode;

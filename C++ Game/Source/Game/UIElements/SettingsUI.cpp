@@ -7,14 +7,12 @@
 // 
 //=====================================================================//
 #include "UltraEngine.h"
-#include "SettingsWindow.h"
+#include "SettingsUI.h"
 
 namespace UltraEngine::Game
 {
-	SettingsWindow::SettingsWindow()
+	SettingsUI::SettingsUI()
 	{
-		window = NULL;
-		ui = NULL;
 		listbox = NULL;
 		mainpanel = NULL;
 		panel.fill(NULL);
@@ -23,158 +21,30 @@ namespace UltraEngine::Game
 		button_apply = NULL;
 	}
 
-	bool SettingsWindow::ProcessEvent(const Event& e)
+	SettingsUI::~SettingsUI()
 	{
-		if (e.id == EVENT_WINDOWCLOSE)
-		{
-			if (e.source == window)
-			{
-				EmitEvent(EVENT_QUIT);
-			}
-		}
-		else if (e.id == EVENT_WINDOWDPICHANGED)
-		{
-			//Resize window if desired
-			window->SetShape(e.position, e.size);
-
-			//Get the user interface
-			ui->SetScale(float(e.data) / 100.0f);
-		}
-		else if (e.id == EVENT_WIDGETACTION)
-		{
-			if (e.source == button_ok)
-			{
-				// Apply and quit
-				ApplySettings();
-				EmitEvent(EVENT_QUIT);
-			}
-			else if (e.source == button_cancel)
-			{
-				// Quit
-				EmitEvent(EVENT_QUIT);
-			}
-			else if (e.source == button_apply)
-			{
-				// Apply but don't quit.
-				ApplySettings();
-			}
-		}
-		else if (e.id == EVENT_WIDGETSELECT)
-		{
-			if (e.source == listbox)
-			{
-				for (std::size_t n = 0; n < panel.size(); ++n)
-				{
-					if (n == e.data)
-					{
-						panel[n]->SetHidden(false);
-					}
-					else
-					{
-						panel[n]->SetHidden(true);
-					}
-				}
-			}
-			else if (e.source == combo_display)
-			{
-				auto res_combo_box_class = combo_resoultion->As<ResoultionComboBox>();
-				if (res_combo_box_class)
-				{
-					res_combo_box_class->ShowDisplayBox(e.data);
-				}
-			}
-			else if (e.source == combo_windowmode)
-			{
-				// Force the res combo box to the user's native resoultion.
-				if (combo_windowmode->GetSelectedItem() == 3)
-				{
-					auto res_combo_box_class = combo_resoultion->As<ResoultionComboBox>();
-					if (res_combo_box_class)
-					{
-						const int index = combo_display->GetSelectedItem();
-						auto display = GetDisplays()[index];
-						String str = String(display->size.x) + " x " + String(display->size.y);
-						res_combo_box_class->ShowDisplayBox(index);
-						res_combo_box_class->ForceSelection(index, str);
-
-						res_combo_box_class->Disable();
-					}
-				}
-				else
-				{
-					auto res_combo_box_class = combo_resoultion->As<ResoultionComboBox>();
-					if (res_combo_box_class)
-					{
-						res_combo_box_class->Enable();
-					}
-				}
-			}
-			else if (e.source == combo_windowtheme)
-			{
-				auto config = GetProgram()->config;
-				WString theme = "UI/Color Schemes/dark.json";
-
-				bool lightmode = false;
-				const TitlebarTheme themesetting = (TitlebarTheme)e.data;
-				if (themesetting == TITLEBAR_DEFAULT)
-					lightmode = true;
-				else if (themesetting == TITLEBAR_SYSTEM)
-					lightmode = LightThemeEnabled();
-
-				if (lightmode == false)
-				{
-					if (config["colorSchemesPath"].is_string() && config["defaultSettings"]["darkColorScheme"].is_string())
-					{
-						theme = String(config["colorSchemesPath"]) + "/" + String(config["defaultSettings"]["darkColorScheme"]);
-					}
-				}
-				else
-				{
-					if (config["colorSchemesPath"].is_string() && config["defaultSettings"]["lightColorScheme"].is_string())
-					{
-						theme = String(config["colorSchemesPath"]) + "/" + String(config["defaultSettings"]["lightColorScheme"]);
-					}
-				}
-
-				SetWindowTitlebarTheme(window, themesetting);
-				ui->LoadColorScheme(theme);
-
-			}
-			else if (e.source == tabber_actionsets)
-			{
-				for (int n = 0; n < tabber_actionsets->items.size(); ++n)
-				{
-					if (n == e.data)
-					{
-						tabber_panels[n]->SetHidden(false);
-					}
-					else
-					{
-						tabber_panels[n]->SetHidden(true);
-					}
-				}
-			}
-
-		}
-
-		return true;
+		listbox = NULL;
+		mainpanel = NULL;
+		panel.fill(NULL);
+		button_ok = NULL;
+		button_cancel = NULL;
+		button_apply = NULL;
 	}
 
-	void SettingsWindow::BuildGUI()
+	void SettingsUI::BuildWidgets(const iVec2& size, const shared_ptr<Widget> parent)
 	{
-		ui = CreateInterface(window);
-		ui->LoadColorScheme(GetProgram()->GetGUITheme());
+		root = CreatePanel(0, 0, size.x, size.y, parent);
+		root->SetLayout(1, 1, 1, 1);
+		auto ui_size = root->GetSize();
 
-		// Build base UI panels
-		auto ui_size = ui->root->GetSize();
-		listbox = CreateListBox(8, 8, 150, ui_size.y - 8 - 50, ui->root);
+		listbox = CreateListBox(8, 8, 150, ui_size.y - 8 - 50, root);
 		listbox->SetLayout(1, 0, 1, 1);
 		listbox->AddItem("Window", true);
 		listbox->AddItem("Graphics");
 		listbox->AddItem("Controls");
 		listbox->AddItem("Sound");
 
-		mainpanel = CreatePanel(listbox->GetPosition().x + listbox->GetSize().x + 8, 8, ui_size.x - (listbox->GetPosition().x + listbox->GetSize().x) - 16, ui_size.y - 8 - 50, ui->root, PANEL_BORDER);
+		mainpanel = CreatePanel(listbox->GetPosition().x + listbox->GetSize().x + 8, 8, ui_size.x - (listbox->GetPosition().x + listbox->GetSize().x) - 16, ui_size.y - 8 - 50, root, PANEL_BORDER);
 		mainpanel->SetLayout(1, 1, 1, 1);
 
 		panel[0] = CreatePanel(0, 0, ui_size.x - (listbox->GetPosition().x + listbox->GetSize().x) - 16, ui_size.y - 8 - 50, mainpanel);
@@ -193,11 +63,11 @@ namespace UltraEngine::Game
 		panel[3]->SetLayout(1, 1, 1, 1);
 		panel[3]->SetHidden(true);
 
-		button_apply = CreateButton("Apply", ui_size.x - (72 + 8), mainpanel->GetPosition().y + mainpanel->GetSize().y + 8, 72, 32, ui->root);
+		button_apply = CreateButton("Apply", ui_size.x - (72 + 8), mainpanel->GetPosition().y + mainpanel->GetSize().y + 8, 72, 32, root);
 		button_apply->SetLayout(0, 1, 0, 1);
-		button_cancel = CreateButton("Cancel", button_apply->GetPosition().x - (button_apply->GetSize().x + 8), button_apply->GetPosition().y, button_apply->GetSize().x, button_apply->GetSize().y, ui->root);
+		button_cancel = CreateButton("Cancel", button_apply->GetPosition().x - (button_apply->GetSize().x + 8), button_apply->GetPosition().y, button_apply->GetSize().x, button_apply->GetSize().y,root);
 		button_cancel->SetLayout(0, 1, 0, 1);
-		button_ok = CreateButton("OK", button_cancel->GetPosition().x - (button_cancel->GetSize().x + 8), button_cancel->GetPosition().y, button_cancel->GetSize().x, button_cancel->GetSize().y, ui->root, BUTTON_OK);
+		button_ok = CreateButton("OK", button_cancel->GetPosition().x - (button_cancel->GetSize().x + 8), button_cancel->GetPosition().y, button_cancel->GetSize().x, button_cancel->GetSize().y, root, BUTTON_OK);
 		button_ok->SetLayout(0, 1, 0, 1);
 
 		// Get the subpanel pointer
@@ -300,7 +170,7 @@ namespace UltraEngine::Game
 		Assert(activepanel);
 
 		auto gamecontroller = GetProgram()->gamecontroller;
-		tabber_actionsets = CreateTabber(0,0, activepanel->GetSize().x, activepanel->GetSize().y, activepanel, TABBER_MINIMAL);
+		tabber_actionsets = CreateTabber(0, 0, activepanel->GetSize().x, activepanel->GetSize().y, activepanel, TABBER_MINIMAL);
 
 		// Create a tab for every action set.
 		{
@@ -334,9 +204,13 @@ namespace UltraEngine::Game
 							continue;
 						}
 
-						auto bindpanel = CreateInputBindPanel(key, gamecontroller->config[p], 4, space, panel->GetSize().x - 8, 40, panel, p);
-						space = bindpanel->GetPosition().y + bindpanel->GetSize().y + 4;
-						button_binds.push_back(bindpanel);
+						// HACK: Skip "mousecursor"
+						if (key != "mousecursor")
+						{
+							auto bindpanel = CreateInputBindPanel(key, gamecontroller->config[p], 4, space, panel->GetSize().x - 8, 40, panel, p);
+							space = bindpanel->GetPosition().y + bindpanel->GetSize().y + 4;
+							button_binds.push_back(bindpanel);
+						}
 					}
 				}
 				tabber_panels.push_back(panel);
@@ -374,7 +248,7 @@ namespace UltraEngine::Game
 						}
 						continue;
 					}
-					
+
 					auto bindpanel = CreateInputBindPanel(key, gamecontroller->config, 4, space, panel->GetSize().x - 8, 40, panel);
 					space = bindpanel->GetPosition().y + bindpanel->GetSize().y + 4;
 					button_binds.push_back(bindpanel);
@@ -415,15 +289,138 @@ namespace UltraEngine::Game
 
 		label_hrtf = CreateLabel("Head-Related Transfer Function (HRTF)", 8, 8, 220, 28, activepanel, LABEL_MIDDLE | LABEL_LEFT);
 		label_hrtf->SetLayout(1, 0, 0, 0);
-		
+
 		setting = GetProgram()->GetSetting(SETTING_HRTF, 0);
 		combo_hrtf = CreateComboBox(activepanel->GetSize().x - (180 + 8), label_hrtf->GetPosition().y, 180, 28, activepanel);
 		combo_hrtf->SetLayout(0, 1, 1, 0);
 		combo_hrtf->AddItem("Disabled", (bool)setting == false);
 		combo_hrtf->AddItem("Enabled", (bool)setting == true);
+
+		Listen(EVENT_NONE);
 	}
 
-	void SettingsWindow::ApplySettings()
+	bool SettingsUI::ProcessEvent(const Event& e)
+	{
+		if (e.id == EVENT_WIDGETACTION)
+		{
+			if (e.source == button_ok)
+			{
+				// Apply and quit
+				ApplySettings();
+				EmitEvent(EVENT_QUIT);
+			}
+			else if (e.source == button_cancel)
+			{
+				// Quit
+				EmitEvent(EVENT_QUIT);
+			}
+			else if (e.source == button_apply)
+			{
+				// Apply but don't quit.
+				ApplySettings();
+			}
+		}
+		else if (e.id == EVENT_WIDGETSELECT)
+		{
+			if (e.source == listbox)
+			{
+				for (std::size_t n = 0; n < panel.size(); ++n)
+				{
+					if (n == e.data)
+					{
+						panel[n]->SetHidden(false);
+					}
+					else
+					{
+						panel[n]->SetHidden(true);
+					}
+				}
+			}
+			else if (e.source == combo_display)
+			{
+				auto res_combo_box_class = combo_resoultion->As<ResoultionComboBox>();
+				if (res_combo_box_class)
+				{
+					res_combo_box_class->ShowDisplayBox(e.data);
+				}
+			}
+			else if (e.source == combo_windowmode)
+			{
+				// Force the res combo box to the user's native resoultion.
+				if (combo_windowmode->GetSelectedItem() == 3)
+				{
+					auto res_combo_box_class = combo_resoultion->As<ResoultionComboBox>();
+					if (res_combo_box_class)
+					{
+						const int index = combo_display->GetSelectedItem();
+						auto display = GetDisplays()[index];
+						String str = String(display->size.x) + " x " + String(display->size.y);
+						res_combo_box_class->ShowDisplayBox(index);
+						res_combo_box_class->ForceSelection(index, str);
+
+						res_combo_box_class->Disable();
+					}
+				}
+				else
+				{
+					auto res_combo_box_class = combo_resoultion->As<ResoultionComboBox>();
+					if (res_combo_box_class)
+					{
+						res_combo_box_class->Enable();
+					}
+				}
+			}
+			else if (e.source == combo_windowtheme)
+			{
+				auto config = GetProgram()->config;
+				WString theme = "UI/Color Schemes/dark.json";
+
+				bool lightmode = false;
+				const TitlebarTheme themesetting = (TitlebarTheme)e.data;
+				if (themesetting == TITLEBAR_DEFAULT)
+					lightmode = true;
+				else if (themesetting == TITLEBAR_SYSTEM)
+					lightmode = LightThemeEnabled();
+
+				if (lightmode == false)
+				{
+					if (config["colorSchemesPath"].is_string() && config["defaultSettings"]["darkColorScheme"].is_string())
+					{
+						theme = String(config["colorSchemesPath"]) + "/" + String(config["defaultSettings"]["darkColorScheme"]);
+					}
+				}
+				else
+				{
+					if (config["colorSchemesPath"].is_string() && config["defaultSettings"]["lightColorScheme"].is_string())
+					{
+						theme = String(config["colorSchemesPath"]) + "/" + String(config["defaultSettings"]["lightColorScheme"]);
+					}
+				}
+
+				//SetWindowTitlebarTheme(window, themesetting);
+				//ui->LoadColorScheme(theme);
+			}
+			else if (e.source == tabber_actionsets)
+			{
+				for (int n = 0; n < tabber_actionsets->items.size(); ++n)
+				{
+					if (n == e.data)
+					{
+						tabber_panels[n]->SetHidden(false);
+					}
+					else
+					{
+						tabber_panels[n]->SetHidden(true);
+					}
+				}
+			}
+
+		}
+
+		return true;
+	}
+
+	void SettingsUI::ApplySettings()
 	{
 		GetProgram()->SetSetting(SETTING_DISPLAY, combo_display->GetSelectedItem());
 		auto res_combo_box_class = combo_resoultion->As<ResoultionComboBox>();
@@ -482,32 +479,5 @@ namespace UltraEngine::Game
 		{
 			Print("Error: Failed to save controller bindings.");
 		}
-	}
-
-	shared_ptr<SettingsWindow> SettingsWindow::Create()
-	{
-		auto windowsize = iVec2(600, 480);
-		auto display = GetProgram()->maindisplay;
-		auto app = std::make_shared<SettingsWindow>();
-		app->window = CreateWindow("Settings", 0, 0, windowsize.x, windowsize.y, GetProgram()->maindisplay, /*WINDOW_RESIZABLE |*/ WINDOW_DEFAULT);
-		app->window->SetMinSize(windowsize.x / 2, windowsize.y / 2);
-
-		const TitlebarTheme themesetting = (TitlebarTheme)GetProgram()->GetSetting(SETTING_WINDOWTHEME, (int)TITLEBAR_SYSTEM);
-		SetWindowTitlebarTheme(app->window, themesetting);
-
-		if (display->GetScale() != 1.0f)
-		{
-			auto window_size = app->window->GetSize();
-			EmitEvent(EVENT_WINDOWDPICHANGED, app->window, Round(display->GetScale() * 100.0f), 0, 0, Round(window_size.x * display->GetScale()), Round(window_size.y * display->GetScale()));
-		}
-
-		app->BuildGUI();
-
-		return app;
-	}
-
-	shared_ptr<SettingsWindow> CreateSettingWindow()
-	{
-		return SettingsWindow::Create();
 	}
 }

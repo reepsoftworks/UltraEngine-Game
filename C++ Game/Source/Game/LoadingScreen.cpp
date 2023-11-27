@@ -230,9 +230,8 @@ namespace UltraEngine::Game
 		// Build loading screen.
 		BuildLoadScreen();
 
-		// Create the in-game console.
-		//console = CreatePivot(GetProgram()->GetStage()->MenuWorld());
-		//console->AddComponent<InGameConsole>();
+		// If we're in VR, tell the camera to hide as ortho-cameras don't work well in VR.
+		if (GetProgram()->VREnabled()) camera->SetHidden(true);
 	}
 
 	void LoadingScreen::ShowClearScreen()

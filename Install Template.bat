@@ -1,11 +1,10 @@
 :: Run this as administrator.
 @echo off
-SET ULTRAENGINEPATH=C:\Program Files\Ultra Engine
-if not exist "%ULTRAENGINEPATH%" goto Error_MissingLocation
+if not exist "%ULTRAENGINE%" (
+	echo ERROR: Unable to find Ultra Engine installed on this PC!. Try running the editor first!
+	pause
+	EXIT /B 999
+)
 
-xcopy "%~dp0C++ Game" "%ULTRAENGINEPATH%\Templates\C++ Game" /i /d /y /s
+xcopy "%~dp0C++ Game" "%ULTRAENGINE%\Templates\C++ Game" /i /d /y /s
 pause
-
-:Error_MissingLocation
-echo ERROR: Unable to find Ultra Engine installed on this PC!.
-EXIT /B 999

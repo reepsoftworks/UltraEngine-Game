@@ -12,10 +12,8 @@
 
 namespace UltraEngine::Game
 {
-	class SettingsWindow : public UIElement
-	{
-		shared_ptr<UltraEngine::Window> window;
-		shared_ptr<Interface> ui;
+    class SettingsUI : public UIPanel
+    {
 		std::shared_ptr<UltraEngine::Widget> listbox;
 		std::shared_ptr<UltraEngine::Widget> mainpanel;
 		std::array<std::shared_ptr<UltraEngine::Widget>, 4> panel;
@@ -46,14 +44,13 @@ namespace UltraEngine::Game
 		// Sound
 		std::shared_ptr<UltraEngine::Widget> label_hrtf, combo_hrtf;
 
-		void BuildGUI();
 		void ApplySettings();
-	public:
-		SettingsWindow();
 
-		virtual bool ProcessEvent(const Event& e);
-		static shared_ptr<SettingsWindow> SettingsWindow::Create();
-	};
+    public:
+        SettingsUI();
+        ~SettingsUI();
 
-	extern shared_ptr<SettingsWindow> CreateSettingWindow();
+        virtual void BuildWidgets(const iVec2& size, const shared_ptr<Widget> parent);
+        virtual bool ProcessEvent(const Event& e);
+    };
 }

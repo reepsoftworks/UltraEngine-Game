@@ -26,9 +26,7 @@
 				},
 				"castshadows": false,
 				"collisiontype": 0,
-				"components": {
-					"SettingsListener": {}
-				},
+				"components": {},
 				"friction": [
 					0.5,
 					0.8999999761581421

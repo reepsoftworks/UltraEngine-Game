@@ -37,8 +37,16 @@ namespace UltraEngine::Game
 
 	void Canvas::Reposition(const iVec2& framebuffersize)
 	{
-		size = framebuffersize;
-		camera->SetPosition(float(size.x) * 0.5f, float(size.y) * 0.5f, depth);
+		// Never reposition for VR.
+		if (GetProgram()->VREnabled() == false)
+		{
+			size = framebuffersize;
+			camera->SetPosition(float(size.x) * 0.5f, float(size.y) * 0.5f, depth);
+		}
+		else
+		{
+			camera->SetPosition(size.x, size.y, depth);
+		}
 	}
 
 	unsigned int Canvas::GetRenderLayers()
@@ -64,13 +72,26 @@ namespace UltraEngine::Game
 		{
 			canvas = std::make_shared<Canvas>();
 
-			auto sz = GetProgram()->GetFramebufferSize();
-			canvas->camera = CreateCamera(world, PROJECTION_ORTHOGRAPHIC);
-			canvas->camera->SetRenderLayers(renderlayer);
-			canvas->camera->SetClearMode(CLEAR_DEPTH);
-			canvas->camera->SetPosition(float(sz.x) * 0.5f, float(sz.y) * 0.5f, depth);
-			canvas->size = sz;
-			canvas->depth = depth;
+			const bool vr = GetProgram()->VREnabled();
+			if (!vr)
+			{
+				auto sz = GetProgram()->GetFramebufferSize();
+				canvas->camera = CreateCamera(world, PROJECTION_ORTHOGRAPHIC);
+				canvas->camera->SetRenderLayers(renderlayer);
+				canvas->camera->SetClearMode(CLEAR_DEPTH);
+				canvas->camera->SetPosition(float(sz.x) * 0.5f, float(sz.y) * 0.5f, depth);
+				canvas->size = sz;
+				canvas->depth = depth;
+			}
+			else
+			{
+				canvas->camera = CreateCamera(world, PROJECTION_PERSPECTIVE);
+				canvas->camera->SetRenderLayers(renderlayer);
+				canvas->camera->SetClearMode(CLEAR_DEPTH);
+				canvas->camera->SetPosition(0, 0, depth);
+				canvas->size = 0;
+				canvas->depth = depth;
+			}
 		}
 
 		return canvas;

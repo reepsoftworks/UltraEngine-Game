@@ -40,6 +40,14 @@ namespace UltraEngine::Game
 		// Clear all canvases
 		canvases.clear();
 
+#ifdef OPTION_USE_VR
+		// Init VR
+		if (GetProgram()->VREnabled())
+		{
+			hmd[STAGEHMD_MENU] = UltraEngine::GetHmd(menuworld);
+			hmd[STAGEHMD_GAME] = UltraEngine::GetHmd(gameworld);
+		}
+#endif
 		// Set the menu world as the active world.
 		activeworld = menuworld;
 	}
@@ -211,9 +219,8 @@ namespace UltraEngine::Game
 			activeworld = menuworld;
 		}
 
-		auto world = activeworld.lock();
-
 		// Update the world only if the window is not hidden.
+		auto world = activeworld.lock();
 		if (!GetProgram()->ActiveWindow()->GetHidden()) world->Update(frequency, threads, iterations, substeps);
 
 		GetProgram()->Render(world);
@@ -331,8 +338,6 @@ namespace UltraEngine::Game
 
 	}
 
-	// BUGBUG: This causes a crash.
-	// https://www.ultraengine.com/community/topic/62188-worldsave-spits-out-empty-file
 	bool Stage::Load(const WString& path)
 	{
 		bool ret = false;
@@ -439,6 +444,29 @@ namespace UltraEngine::Game
 		}
 
 		return rtn;
+	}
+
+	shared_ptr<Hmd> Stage::GetHmd(const StageHmd stagehmd)
+	{
+#ifdef OPTION_USE_VR
+		if (!GetProgram()->VREnabled())
+			return NULL;
+
+		if (stagehmd == STAGEHMD_ACTIVE)
+		{
+			if (activeworld.lock() == gameworld)
+				return hmd[STAGEHMD_GAME];
+			else
+				return hmd[STAGEHMD_MENU];
+		}
+		else
+		{
+			Assert(hmd[stagehmd] != NULL, "Stage HMD is NULL!");
+			return hmd[stagehmd];
+		}
+#else
+		return NULL;
+#endif
 	}
 
 	shared_ptr<Stage> CreateStage()

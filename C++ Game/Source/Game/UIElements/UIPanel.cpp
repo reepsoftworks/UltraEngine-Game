@@ -6,18 +6,18 @@
 // Do not remove this notice.
 // 
 //=====================================================================//
-#pragma once
 #include "UltraEngine.h"
+#include "UIPanel.h"
 
 namespace UltraEngine::Game
 {
-    class Program;
-    class UIElement : public UltraEngine::Panel
-    {
-    protected:
-        friend Program;
-        static bool EventCallback(const Event& e, shared_ptr<Object> extra);
-        virtual bool ProcessEvent(const Event& e);
-        virtual void Listen(const EventId eventid = EVENT_NONE, shared_ptr<Object> widget = NULL);
-    };
+	UIPanel::UIPanel()
+	{
+		root = NULL;
+	}
+
+	UIPanel::~UIPanel()
+	{
+		root = NULL;
+	}
 }
