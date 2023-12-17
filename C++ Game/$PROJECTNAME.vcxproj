@@ -120,7 +120,6 @@
     <ClCompile Include="Source\Game\CustomWidgets\Spinner.cpp" />
     <ClCompile Include="Source\Game\Game.cpp" />
     <ClCompile Include="Source\Game\GameLuaBindings.cpp" />
-    <ClCompile Include="Source\Game\GameObject.cpp" />
     <ClCompile Include="Source\Game\Input\ButtonCode.cpp" />
     <ClCompile Include="Source\Game\Input\GameController.cpp" />
     <ClCompile Include="Source\Game\Input\Input.cpp" />
@@ -162,7 +161,6 @@
     <ClInclude Include="Source\Game\CustomWidgets\Spinner.h" />
     <ClInclude Include="Source\Game\Game.h" />
     <ClInclude Include="Source\Game\GameLuaBindings.h" />
-    <ClInclude Include="Source\Game\GameObject.h" />
     <ClInclude Include="Source\Game\Input\ButtonCode.h" />
     <ClInclude Include="Source\Game\Input\GameController.h" />
     <ClInclude Include="Source\Game\Input\Input.h" />

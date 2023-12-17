@@ -47,21 +47,30 @@ namespace UltraEngine::Game
 		mainpanel = CreatePanel(listbox->GetPosition().x + listbox->GetSize().x + 8, 8, ui_size.x - (listbox->GetPosition().x + listbox->GetSize().x) - 16, ui_size.y - 8 - 50, root, PANEL_BORDER);
 		mainpanel->SetLayout(1, 1, 1, 1);
 
-		panel[0] = CreatePanel(0, 0, ui_size.x - (listbox->GetPosition().x + listbox->GetSize().x) - 16, ui_size.y - 8 - 50, mainpanel);
+		//scrollpanel[0] = CreateScrollPanel(0, 0, ui_size.x - (listbox->GetPosition().x + listbox->GetSize().x) - 16, ui_size.y - 8 - 50, mainpanel);
+		//scrollpanel[0]->SetLayout(1, 1, 1, 1);
+		//scrollpanel[0]->SetHidden(false);
+		//scrollpanel[0]->SetArea(ui_size.x - (listbox->GetPosition().x + listbox->GetSize().x) - 16, 400);
+
+		panel[0] = CreateScrollPanel(0, 0, ui_size.x - (listbox->GetPosition().x + listbox->GetSize().x) - 16, ui_size.y - 8 - 50, mainpanel);
 		panel[0]->SetLayout(1, 1, 1, 1);
 		panel[0]->SetHidden(false);
+		panel[0]->SetArea(ui_size.x - (listbox->GetPosition().x + listbox->GetSize().x) - 16, 350);
 
-		panel[1] = CreatePanel(0, 0, ui_size.x - (listbox->GetPosition().x + listbox->GetSize().x) - 16, ui_size.y - 8 - 50, mainpanel);
+		panel[1] = CreateScrollPanel(0, 0, ui_size.x - (listbox->GetPosition().x + listbox->GetSize().x) - 16, ui_size.y - 8 - 50, mainpanel);
 		panel[1]->SetLayout(1, 1, 1, 1);
 		panel[1]->SetHidden(true);
+		panel[1]->SetArea(ui_size.x - (listbox->GetPosition().x + listbox->GetSize().x) - 16, 350);
 
-		panel[2] = CreatePanel(0, 0, ui_size.x - (listbox->GetPosition().x + listbox->GetSize().x) - 16, ui_size.y - 8 - 50, mainpanel);
+		panel[2] = CreateScrollPanel(0, 0, ui_size.x - (listbox->GetPosition().x + listbox->GetSize().x) - 16, ui_size.y - 8 - 50, mainpanel);
 		panel[2]->SetLayout(1, 1, 1, 1);
 		panel[2]->SetHidden(true);
+		panel[2]->SetArea(ui_size.x - (listbox->GetPosition().x + listbox->GetSize().x) - 16, 350);
 
-		panel[3] = CreatePanel(0, 0, ui_size.x - (listbox->GetPosition().x + listbox->GetSize().x) - 16, ui_size.y - 8 - 50, mainpanel);
+		panel[3] = CreateScrollPanel(0, 0, ui_size.x - (listbox->GetPosition().x + listbox->GetSize().x) - 16, ui_size.y - 8 - 50, mainpanel);
 		panel[3]->SetLayout(1, 1, 1, 1);
 		panel[3]->SetHidden(true);
+		panel[3]->SetArea(ui_size.x - (listbox->GetPosition().x + listbox->GetSize().x) - 16, 350);
 
 		button_apply = CreateButton("Apply", ui_size.x - (72 + 8), mainpanel->GetPosition().y + mainpanel->GetSize().y + 8, 72, 32, root);
 		button_apply->SetLayout(0, 1, 0, 1);
@@ -71,7 +80,7 @@ namespace UltraEngine::Game
 		button_ok->SetLayout(0, 1, 0, 1);
 
 		// Get the subpanel pointer
-		auto activepanel = panel[0]; //->As<ScrollPanel>()->subpanel;
+		auto activepanel = panel[0]->subpanel; //->As<ScrollPanel>()->subpanel;
 		Assert(activepanel);
 
 		// Display + Resoultion
@@ -118,7 +127,7 @@ namespace UltraEngine::Game
 		combo_windowtheme->SetLayout(0, 1, 1, 0);
 
 		// Next panel....
-		activepanel = panel[1];
+		activepanel = panel[1]->subpanel;
 		Assert(activepanel);
 
 		// Light Quality
@@ -166,18 +175,19 @@ namespace UltraEngine::Game
 		slider_fov->SetLayout(0, 1, 1, 0);
 
 		// Next panel....
-		activepanel = panel[2];
+		activepanel = panel[2]->subpanel;
 		Assert(activepanel);
 
 		auto gamecontroller = GetProgram()->gamecontroller;
 		tabber_actionsets = CreateTabber(0, 0, activepanel->GetSize().x, activepanel->GetSize().y, activepanel, TABBER_MINIMAL);
 
+		int panelheight = 40;
 		// Create a tab for every action set.
 		{
 			for (const auto& p : gamecontroller->GetActionSets())
 			{
 				tabber_actionsets->AddItem(p);
-				auto panel = CreatePanel(0, 0, tabber_actionsets->GetSize().x, tabber_actionsets->GetSize().y, tabber_actionsets);
+				auto panel = CreatePanel(0, 0, tabber_actionsets->GetSize().x - 8, tabber_actionsets->GetSize().y, tabber_actionsets);
 				int space = 4;
 				if (!gamecontroller->config[p].empty())
 				{
@@ -194,7 +204,7 @@ namespace UltraEngine::Game
 								// HACK: Skip anything with "Camera". Binding vector axes is unsupported!!
 								if (!axisname.empty() && axisname != "Camera")
 								{
-									auto bindpanel = CreateInputBindPanel(axisname, gamecontroller->config[p]["axes"], 4, space, panel->GetSize().x - 8, 40, panel, p);
+									auto bindpanel = CreateInputBindPanel(axisname, gamecontroller->config[p]["axes"], 4, space, panel->GetSize().x - 8, panelheight, panel, p);
 									auto cast = bindpanel->As<InputBindPanel>();
 									if (cast) cast->savetoaxis = true;
 									space = bindpanel->GetPosition().y + bindpanel->GetSize().y + 4;
@@ -207,7 +217,7 @@ namespace UltraEngine::Game
 						// HACK: Skip "mousecursor"
 						if (key != "mousecursor")
 						{
-							auto bindpanel = CreateInputBindPanel(key, gamecontroller->config[p], 4, space, panel->GetSize().x - 8, 40, panel, p);
+							auto bindpanel = CreateInputBindPanel(key, gamecontroller->config[p], 4, space, panel->GetSize().x - 8, panelheight, panel, p);
 							space = bindpanel->GetPosition().y + bindpanel->GetSize().y + 4;
 							button_binds.push_back(bindpanel);
 						}
@@ -220,7 +230,7 @@ namespace UltraEngine::Game
 		// Global Controls
 		{
 			tabber_actionsets->AddItem("Global");
-			auto panel = CreatePanel(0, 0, tabber_actionsets->GetSize().x, tabber_actionsets->GetSize().y, tabber_actionsets);
+			auto panel = CreatePanel(0, 0, tabber_actionsets->GetSize().x - 8, tabber_actionsets->GetSize().y, tabber_actionsets);
 			int space = 4;
 			if (!gamecontroller->config.empty())
 			{
@@ -239,7 +249,7 @@ namespace UltraEngine::Game
 							// HACK: Skip anything with "Camera". Binding vector axes is unsupported!!
 							if (!axisname.empty() && axisname != "Camera")
 							{
-								auto bindpanel = CreateInputBindPanel(axisname, gamecontroller->config["axes"], 4, space, panel->GetSize().x - 8, 40, panel);
+								auto bindpanel = CreateInputBindPanel(axisname, gamecontroller->config["axes"], 4, space, panel->GetSize().x - 8, panelheight, panel);
 								auto cast = bindpanel->As<InputBindPanel>();
 								if (cast) cast->savetoaxis = true;
 								space = bindpanel->GetPosition().y + bindpanel->GetSize().y + 4;
@@ -249,7 +259,7 @@ namespace UltraEngine::Game
 						continue;
 					}
 
-					auto bindpanel = CreateInputBindPanel(key, gamecontroller->config, 4, space, panel->GetSize().x - 8, 40, panel);
+					auto bindpanel = CreateInputBindPanel(key, gamecontroller->config, 4, space, panel->GetSize().x - 8, panelheight, panel);
 					space = bindpanel->GetPosition().y + bindpanel->GetSize().y + 4;
 					button_binds.push_back(bindpanel);
 				}
@@ -263,7 +273,7 @@ namespace UltraEngine::Game
 		// Settings
 		{
 			tabber_actionsets->AddItem("Settings");
-			auto panel = CreatePanel(0, 0, tabber_actionsets->GetSize().x, tabber_actionsets->GetSize().y, tabber_actionsets);
+			auto panel = CreatePanel(0, 0, tabber_actionsets->GetSize().x - 8, tabber_actionsets->GetSize().y, tabber_actionsets);
 			int space = 4;
 			if (!gamecontroller->config["settings"].empty())
 			{
@@ -283,8 +293,14 @@ namespace UltraEngine::Game
 		// Set the first item as selected.
 		tabber_actionsets->SelectItem(0);
 
+		// Resize the scroll subpanel based on the total number of button_binds. 
+		// It's not perfect,but it's good enough to ensure everything is being drawn since the orginal code didn't
+		// consider scrollpanels.
+		tabber_actionsets->SetShape(iVec2(0), iVec2(tabber_actionsets->GetSize().x, (int)button_binds.size() * panelheight));
+		panel[2]->SetArea(tabber_actionsets->GetSize().x, tabber_actionsets->GetSize().y);
+
 		// Next panel....
-		activepanel = panel[3];
+		activepanel = panel[3]->subpanel;
 		Assert(activepanel);
 
 		label_hrtf = CreateLabel("Head-Related Transfer Function (HRTF)", 8, 8, 220, 28, activepanel, LABEL_MIDDLE | LABEL_LEFT);
@@ -301,7 +317,15 @@ namespace UltraEngine::Game
 
 	bool SettingsUI::ProcessEvent(const Event& e)
 	{
-		if (e.id == EVENT_WIDGETACTION)
+		if (e.id == EVENT_WINDOWSIZE)
+		{
+			auto ui_size = root->GetSize();
+			for (int i = 0; i < panel.size() -1; i++)
+			{
+				panel[i]->SetArea(ui_size.x - (listbox->GetPosition().x + listbox->GetSize().x) - 16, 350);
+			}
+		}
+		else if (e.id == EVENT_WIDGETACTION)
 		{
 			if (e.source == button_ok)
 			{

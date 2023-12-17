@@ -16,7 +16,8 @@ namespace UltraEngine::Game
     {
 		std::shared_ptr<UltraEngine::Widget> listbox;
 		std::shared_ptr<UltraEngine::Widget> mainpanel;
-		std::array<std::shared_ptr<UltraEngine::Widget>, 4> panel;
+		//std::array<std::shared_ptr<ScrollPanel>, 4> scrollpanel;
+		std::array<std::shared_ptr<ScrollPanel>, 4> panel;
 		std::shared_ptr<UltraEngine::Widget> button_ok;
 		std::shared_ptr<UltraEngine::Widget> button_cancel;
 		std::shared_ptr<UltraEngine::Widget> button_apply;

@@ -46,7 +46,6 @@ using namespace UltraEngine;
 //Game
 #include "Stage.h"
 #include "GameLuaBindings.h"
-#include "GameObject.h"
 #include "LoadingScreen.h"
 #include "Canvas.h"
 
@@ -76,9 +75,6 @@ using namespace UltraEngine;
 #define COMMAND_SAVE "save"
 #define COMMAND_RESTART "restart"
 #define COMMAND_QUIT "quit"
-#define COMMAND_SHOWDEBUG "d_show"
-#define COMMAND_SHOWPHYSICS "d_physics"
-#define COMMAND_WIREFRAME "d_wireframe"
 
 //Settings (Also Commands)
 #define SETTING_SCREENWIDTH "screenwidth"
@@ -94,15 +90,6 @@ using namespace UltraEngine;
 
 //Fallback Assets
 #define ASSETFALLBACK_SOUND "Sound/error.wav"
-
-//Render Layers
-#define RENDERLAYER_NULL 0
-#define RENDERLAYER_DEFAULT 1
-#define RENDERLAYER_HIGHLIGHT 2
-#define RENDERLAYER_HIGHLIGHT2D 4
-#define RENDERLAYER_DEBUG 8
-#define RENDERLAYER_VIEWMODEL 16
-#define RENDERLAYER_HUD 1
 
 //Options
 #define OPTION_USE_CONSOLEWINDOW 1
